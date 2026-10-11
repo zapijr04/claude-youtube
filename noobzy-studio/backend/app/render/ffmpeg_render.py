@@ -42,12 +42,20 @@ def _clamp01(expr: str) -> str:
 
 
 def _cut_and_concat(scenes: list[Scene]) -> tuple[str, str]:
+    """Trim+concat each kept Scene. A scene with playback_rate != 1.0 (a
+    speed ramp -- app.timeline.retime.apply_speed_ramp) gets its PTS
+    divided by the rate: rate>1 plays the same source material in less
+    output time (sped up), rate<1 stretches it out (slow motion). The
+    timeline's own output_start/end for everything downstream is kept
+    consistent with this by the retime module, not by the renderer.
+    """
     parts = []
     labels = []
     for i, sc in enumerate(scenes):
+        rate_expr = f"(PTS-STARTPTS)/{sc.playback_rate:.6f}" if abs(sc.playback_rate - 1.0) > 1e-6 else "PTS-STARTPTS"
         parts.append(
             f"[0:v]trim=start={sc.source_in_sec:.3f}:end={sc.source_out_sec:.3f},"
-            f"setpts=PTS-STARTPTS[s{i}]"
+            f"setpts={rate_expr}[s{i}]"
         )
         labels.append(f"[s{i}]")
     concat = "".join(labels) + f"concat=n={len(scenes)}:v=1:a=0[cut]"
@@ -122,6 +130,31 @@ def _apply_text(label_in: str, layers: list[GraphicLayer], captions: list[dict],
             box = (
                 f"drawtext=text='{text}':fontcolor=white:fontsize={int(h*0.045)}:"
                 f"x=w-tw-40:y=40:box=1:boxcolor=0x0E7CFF@0.85:boxborderw=14:enable='{enable}'"
+            )
+        elif layer.kind == GraphicLayerKind.timer:
+            # A REAL live countdown (ffmpeg's %{eif:...} text-expansion,
+            # re-evaluated every frame), not a static label -- counts down
+            # from params['from_sec'] (default: the layer's own window
+            # length) to 0 as t runs from start to end.
+            from_sec = int(layer.params.get("from_sec", round(end - start)))
+            label = _esc_text(layer.params.get("label", "TIME LEFT"))
+            countdown_expr = f"%{{eif\\:{from_sec}-(t-{start:.3f})\\:d}}"
+            box = (
+                f"drawtext=text='{label}\\: {countdown_expr}s':fontcolor=0xFFD700:"
+                f"fontsize={int(h*0.05)}:x=40:y=40:box=1:boxcolor=black@0.6:boxborderw=14:"
+                f"enable='{enable}'"
+            )
+        elif layer.kind == GraphicLayerKind.arrow:
+            # A tracked pointer that slides across its window toward
+            # whatever it's meant to call out (an egg, an upgrade, a
+            # cutout subject) -- real per-frame motion via drawtext's own
+            # x expression, not a static icon.
+            progress = _clamp01(f"(t-{start:.3f})/{max(end - start, 0.01):.3f}")
+            x_expr = f"(w-tw)*{progress}"
+            box = (
+                f"drawtext=text='→':font='DejaVu Sans':fontcolor=0xFFD700:"
+                f"fontsize={int(h*0.09)}:x='{x_expr}':y=h*0.45:"
+                f"borderw=3:bordercolor=black:enable='{enable}'"
             )
         elif layer.kind == GraphicLayerKind.end_screen:
             text = _esc_text(layer.params.get("text", ""))
@@ -200,7 +233,13 @@ def render(
     width: int = 1920,
     height: int = 1080,
     fps: float = 30.0,
+    fast: bool = False,
 ) -> str:
+    """fast=True is the preview-quality encode (app.pipeline.render_preview):
+    same real filter graph and audio, just a much quicker x264 preset/CRF
+    so repeated edits get a usable preview without the full-quality
+    export's encode time. fast=False (the default) is the final-export
+    quality used by app.pipeline.render_final_export."""
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -224,6 +263,7 @@ def render(
 
     filter_complex = ";".join(stages)
 
+    x264_preset, crf, audio_bitrate = ("ultrafast", "30", "128k") if fast else ("medium", "20", "192k")
     cmd = [
         "ffmpeg", "-y",
         "-i", str(media_path),
@@ -231,8 +271,8 @@ def render(
         "-i", str(final_audio_path),
         "-filter_complex", filter_complex,
         "-map", f"[{final_label}]", "-map", "2:a",
-        "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p",
-        "-c:a", "aac", "-b:a", "192k",
+        "-c:v", "libx264", "-preset", x264_preset, "-crf", crf, "-pix_fmt", "yuv420p",
+        "-c:a", "aac", "-b:a", audio_bitrate,
         "-shortest",
         str(out_path),
     ]

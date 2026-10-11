@@ -74,12 +74,66 @@ export const api = {
     request(`/projects/${projectId}/analyze?media_id=${mediaId}`, { method: "POST" }),
 
   getTimeline: (projectId: string) => request(`/projects/${projectId}/timeline`),
+  putTimeline: (projectId: string, timeline: unknown) =>
+    request(`/projects/${projectId}/timeline`, { method: "PUT", body: JSON.stringify(timeline) }),
+  listTimelineVersions: (projectId: string) =>
+    request<{ version: number; saved_at: string }[]>(`/projects/${projectId}/timeline/versions`),
+  rollbackTimeline: (projectId: string, version: number) =>
+    request(`/projects/${projectId}/timeline/rollback?version=${version}`, { method: "POST" }),
 
-  render: (projectId: string, mediaId: string, sfxDensity = "balanced") =>
-    request(`/projects/${projectId}/render`, {
+  // Point 6: preview is cheap/cached and NEVER writes a file into the
+  // project's final-export output location -- only Export Final Video does.
+  preview: (projectId: string, mediaId: string, sfxDensity = "balanced") =>
+    request(`/projects/${projectId}/preview`, {
       method: "POST",
       body: JSON.stringify({ media_id: mediaId, sfx_density: sfxDensity }),
     }),
+
+  exportFinalVideo: (
+    projectId: string,
+    mediaId: string,
+    opts?: { sfxDensity?: string; outputDir?: string; filename?: string }
+  ) =>
+    request(`/projects/${projectId}/export/final-video`, {
+      method: "POST",
+      body: JSON.stringify({
+        media_id: mediaId,
+        sfx_density: opts?.sfxDensity ?? "balanced",
+        output_dir: opts?.outputDir ?? null,
+        filename: opts?.filename ?? "final.mp4",
+      }),
+    }),
+
+  finalExportHistory: (projectId: string) =>
+    request<{ id: string; output_path: string; status: string }[]>(
+      `/projects/${projectId}/export/final-video/history`
+    ),
+
+  voiceCoverageReport: (projectId: string) =>
+    request<{
+      voice_coverage_ratio: number;
+      gaps_over_threshold: { start_sec: number; end_sec: number; duration_sec: number }[];
+    }>(`/projects/${projectId}/voice-coverage-report`),
+
+  regenerateNarrationBlock: (projectId: string, blockId: string) =>
+    request(`/projects/${projectId}/narration/${blockId}/regenerate`, { method: "POST" }),
+
+  speedRampScene: (projectId: string, sceneId: string, rate: number) =>
+    request(`/projects/${projectId}/scenes/${sceneId}/speed-ramp`, {
+      method: "POST",
+      body: JSON.stringify({ rate }),
+    }),
+
+  learnFromReference: async (file: File, skillId: string, title: string) => {
+    const form = new FormData();
+    form.append("file", file);
+    const res = await fetch(
+      `${API_BASE}/skills/learn-from-reference?skill_id=${encodeURIComponent(skillId)}&title=${encodeURIComponent(title)}`,
+      { method: "POST", body: form }
+    );
+    if (!res.ok) throw new Error(`learn-from-reference failed: ${res.status}`);
+    return res.json();
+  },
 
   listSkills: (enabledOnly = false) => request<SkillManifest[]>(`/skills?enabled_only=${enabledOnly}`),
   approveSkill: (id: string) => request(`/skills/${id}/approve`, { method: "POST" }),

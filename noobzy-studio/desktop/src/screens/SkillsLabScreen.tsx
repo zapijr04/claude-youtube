@@ -5,6 +5,8 @@ import { ScreenProps } from "../App";
 export default function SkillsLabScreen(_: ScreenProps) {
   const [skills, setSkills] = useState<SkillManifest[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [learnResult, setLearnResult] = useState<any>(null);
+  const [learnTitle, setLearnTitle] = useState("Learned Style");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const refresh = () => {
@@ -30,6 +32,18 @@ export default function SkillsLabScreen(_: ScreenProps) {
     refresh();
   };
 
+  const learnFromVideo = async (file: File) => {
+    setError(null);
+    try {
+      const slug = `noobzy-learned-${Date.now()}`;
+      const result = await api.learnFromReference(file, slug, learnTitle);
+      setLearnResult(result);
+      refresh();
+    } catch (e) {
+      setError(String(e));
+    }
+  };
+
   return (
     <div>
       <h1>Skills Lab</h1>
@@ -39,6 +53,28 @@ export default function SkillsLabScreen(_: ScreenProps) {
       <div className="panel">
         <h2 style={{ marginTop: 0 }}>Import a Skill (Markdown)</h2>
         <input ref={fileRef} type="file" accept=".md" onChange={(e) => e.target.files?.[0] && importFile(e.target.files[0])} />
+      </div>
+
+      <div className="panel">
+        <h2 style={{ marginTop: 0 }}>Learn Pacing From a Reference Video</h2>
+        <p className="requirement">
+          Measures real scene-cut pacing (avg shot length, cuts/minute) from an uploaded
+          video using the same detector used on your own footage. Caption/SFX/motion style
+          can NOT be inferred here (no vision/audio model available) -- the proposed skill
+          is staged disabled until you approve it, same as any imported skill.
+        </p>
+        <label>Style name<br />
+          <input type="text" value={learnTitle} onChange={(e) => setLearnTitle(e.target.value)} />
+        </label>
+        <div style={{ marginTop: 10 }}>
+          <input type="file" accept="video/mp4,video/quicktime" onChange={(e) => e.target.files?.[0] && learnFromVideo(e.target.files[0])} />
+        </div>
+        {learnResult && (
+          <div style={{ marginTop: 10, fontSize: 13 }}>
+            <p>Measured: avg shot {learnResult.analysis.avg_shot_length_sec}s, {learnResult.analysis.cuts_per_minute} cuts/min, {learnResult.analysis.shot_count} shots detected.</p>
+            <p className="subtitle">Proposed skill <code>{learnResult.manifest.id}</code> staged disabled -- approve it in the table below.</p>
+          </div>
+        )}
       </div>
 
       {!skills && <p className="subtitle">Loading...</p>}

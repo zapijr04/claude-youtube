@@ -24,15 +24,19 @@ noobzy-studio/
       schemas.py       Typed data contracts (Project, TimelineDocument, ...)
       db.py             SQLite persistence + migrations
       media/            ffprobe, thumbnails/waveform/proxy, scene-cut detection
-      timeline/         TimelineDocument builder (grounded rough cuts)
-      render/           FFmpeg render engine (cuts, motion, overlays, captions)
-      audio/            Procedural SFX synth, cue planner, multi-bus mix/ducking, TTS
+      timeline/         TimelineDocument builder (grounded rough cuts) + retime.py (speed ramps, narration resync)
+      render/           FFmpeg render engine (cuts, motion, overlays, captions, timer, arrow)
+      audio/            Procedural SFX synth, cue planner (incl. pitch/speed), multi-bus mix/ducking, TTS
       skills/           Skill loader/validator/importer
+      learning/         Reference-video pacing analysis -> proposed skill (point 4)
       memory/           Persistent memory store
       export/           SRT, OTIO, FCPXML export
       compute/          Compute provider abstraction (local/GPU/ComfyUI/RunPod)
+      pipeline.py       The one render pipeline: render_preview (cache-only) vs. render_final_export
+                        (the only code path allowed to write into a project's output folder)
       main.py           FastAPI app wiring every module together
-    tests/              pytest suite (33 tests) incl. synthetic fixture generator
+    tests/              pytest suite (37 tests) incl. synthetic fixture generator and the
+                        Point 6 non-destructive-editing regression test
   desktop/            Electron + Vite + React + TypeScript desktop shell
   skills_library/     24 built-in versioned skills (SKILL.md + manifest.json)
   docs/               ARCHITECTURE.md, IMPLEMENTATION_STATUS.md, DECISIONS.md
@@ -87,10 +91,16 @@ cd noobzy-studio/backend
 .venv/bin/python -m pytest tests/ -v
 ```
 
-33 tests, all passing as of this build -- see `docs/IMPLEMENTATION_STATUS.md`
+37 tests, all passing as of this build -- see `docs/IMPLEMENTATION_STATUS.md`
 for the full breakdown and what each one proves.
 
 ### 4. Try it end-to-end with curl
+
+Editing is non-destructive: every change is saved to the project's
+`TimelineDocument` (with full version history) and only shows up as a real
+MP4 via an explicit **Preview** (cheap, cached, written only to the app's
+cache) or **Export Final Video** (the one action that writes a finished
+MP4 to your chosen output folder) call -- never on every edit.
 
 ```bash
 # Generate the synthetic test fixtures (clearly-labeled synthetic gameplay)
@@ -103,7 +113,14 @@ MID=$(curl -s -X POST "localhost:8077/projects/$PID/media" \
   -F "file=@tests/fixtures/generated/fixture_long.mp4;type=video/mp4" | python3 -c "import json,sys;print(json.load(sys.stdin)['id'])")
 
 curl -s -X POST "localhost:8077/projects/$PID/analyze?media_id=$MID"
-curl -s -X POST "localhost:8077/projects/$PID/render" -H 'Content-Type: application/json' \
+
+# Cheap, cached preview -- writes ONLY to backend/data/cache/, never to an output folder.
+curl -s -X POST "localhost:8077/projects/$PID/preview" -H 'Content-Type: application/json' \
+  -d "{\"media_id\":\"$MID\"}"
+
+# The ONE action that writes a finished MP4 (+ stems + SRT/OTIO/FCPXML/timeline.json)
+# to backend/data/exports/<project_id>/ by default, or wherever you pass as output_dir.
+curl -s -X POST "localhost:8077/projects/$PID/export/final-video" -H 'Content-Type: application/json' \
   -d "{\"media_id\":\"$MID\"}"
 ```
 

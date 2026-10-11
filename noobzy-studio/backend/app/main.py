@@ -12,15 +12,15 @@ from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from app import db
-from app.audio import cues, mix, sfx_library, tts
+from app import db, pipeline
+from app.audio import mix
+from app.audio import tts as tts_mod
 from app.compute import providers as compute_providers
 from app.creative_brief import parse_intent
 from app.export import otio_export, srt_export
 from app.media import ffprobe_util, proxy, scenes as scenes_mod
 from app.memory import store as memory_store
 from app.render import ffmpeg_render
-from app.render.overlays import make_cutout_png
 from app.schemas import (
     AspectPreset,
     MemoryRecordKind,
@@ -31,10 +31,13 @@ from app.schemas import (
 )
 from app.skills import loader as skills_loader
 from app.skills.seed_data import SKILLS
-from app.timeline.builder import build_rough_cut_from_scene_cuts
+from app.timeline.builder import build_rough_cut_from_scene_cuts, select_windows_for_target_duration
+from app.timeline.retime import apply_speed_ramp, resync_after_narration_change
 
 DATA_DIR = Path(db.DATA_DIR)
 MEDIA_DIR = DATA_DIR / "media"
+CACHE_DIR = DATA_DIR / "cache"  # ALL preview/proxy/intermediate artifacts live here
+EXPORTS_DIR = DATA_DIR / "exports"  # default final-export output location
 SKILLS_LIBRARY_DIR = Path(__file__).resolve().parent.parent.parent / "skills_library"
 
 app = FastAPI(title="NOOBZY AI STUDIO API", version="0.1.0")
@@ -114,7 +117,9 @@ async def import_media(project_id: str, file: UploadFile) -> dict:
 
 
 @app.post("/projects/{project_id}/analyze")
-def analyze_media(project_id: str, media_id: str, scene_threshold: float = 0.3) -> dict:
+def analyze_media(
+    project_id: str, media_id: str, scene_threshold: float = 0.3, apply_target_duration: bool = False
+) -> dict:
     media_rows = [json.loads(r) for r in db.list_source_media(project_id)]
     media = next((m for m in media_rows if m["id"] == media_id), None)
     if not media:
@@ -124,6 +129,16 @@ def analyze_media(project_id: str, media_id: str, scene_threshold: float = 0.3) 
     windows = scenes_mod.build_scene_windows(cuts, media["duration_sec"])
 
     project = Project.model_validate_json(db.get_project(project_id))
+
+    selected_windows = windows
+    if apply_target_duration:
+        # The "~2h raw -> ~12m story" mode: see
+        # app.timeline.builder.select_windows_for_target_duration for the
+        # documented, honest heuristic (no AI engagement scoring exists
+        # here -- this does not claim to find "the best" moments).
+        selected_windows = select_windows_for_target_duration(windows, project.target_duration_sec)
+    output_duration = sum(e - s for s, e in selected_windows)
+
     timeline = build_rough_cut_from_scene_cuts(
         project_id=project_id,
         media_id=media_id,
@@ -131,13 +146,19 @@ def analyze_media(project_id: str, media_id: str, scene_threshold: float = 0.3) 
         width=media["width"],
         height=media["height"],
         fps=media["fps"],
-        total_duration_sec=media["duration_sec"],
-        windows=windows,
+        total_duration_sec=output_duration,
+        windows=selected_windows,
     )
     db.upsert_timeline(timeline)
     project.status = ProjectStatus.ready
     db.upsert_project(project)
-    return {"detected_cuts": cuts, "windows": windows, "timeline_id": timeline.id}
+    return {
+        "detected_cuts": cuts,
+        "windows": windows,
+        "selected_windows": selected_windows,
+        "output_duration_sec": output_duration,
+        "timeline_id": timeline.id,
+    }
 
 
 @app.get("/projects/{project_id}/timeline")
@@ -150,98 +171,210 @@ def get_timeline(project_id: str) -> dict:
 
 @app.put("/projects/{project_id}/timeline")
 def put_timeline(project_id: str, timeline: TimelineDocument) -> dict:
+    """The ONLY way edits are saved. Cheap: just persists the document and
+    appends a version to timeline_versions (point 6) -- never touches a
+    rendered MP4."""
     if timeline.project_id != project_id:
         raise HTTPException(400, "timeline.project_id mismatch")
-    db.upsert_timeline(timeline)
-    return {"ok": True}
+    version = db.upsert_timeline(timeline)
+    return {"ok": True, "version": version}
 
 
-# ---- render ----
+@app.get("/projects/{project_id}/timeline/versions")
+def list_timeline_versions(project_id: str) -> list[dict]:
+    return db.list_timeline_versions(project_id)
 
 
-class RenderRequest(BaseModel):
+@app.post("/projects/{project_id}/timeline/rollback")
+def rollback_timeline(project_id: str, version: int) -> dict:
+    raw = db.get_timeline_version(project_id, version)
+    if not raw:
+        raise HTTPException(404, f"no timeline version {version} for this project")
+    timeline = TimelineDocument.model_validate_json(raw)
+    new_version = db.upsert_timeline(timeline)  # rollback is itself a new, non-destructive version
+    return {"ok": True, "restored_from_version": version, "new_version": new_version}
+
+
+# ---- preview (cheap, cached, never writes to a user export folder) ----
+
+
+class PreviewRequest(BaseModel):
     media_id: str
     sfx_density: str = "balanced"
-    target_lufs: float = -14.0
 
 
-@app.post("/projects/{project_id}/render")
-def render_project(project_id: str, req: RenderRequest) -> dict:
+def _load_timeline_and_media(project_id: str, media_id: str) -> tuple[TimelineDocument, dict]:
     timeline_raw = db.get_timeline_for_project(project_id)
     if not timeline_raw:
         raise HTTPException(400, "build a timeline before rendering")
     timeline = TimelineDocument.model_validate_json(timeline_raw)
 
     media_rows = [json.loads(r) for r in db.list_source_media(project_id)]
-    media = next((m for m in media_rows if m["id"] == req.media_id), None)
+    media = next((m for m in media_rows if m["id"] == media_id), None)
     if not media:
         raise HTTPException(404, "media not found")
+    return timeline, media
 
-    work_dir = DATA_DIR / "renders" / project_id
-    work_dir.mkdir(parents=True, exist_ok=True)
 
-    for nb in timeline.narration:
-        if nb.duration_sec <= 0:
-            nb.duration_sec = tts.estimate_duration_sec(nb.text)
-        try:
-            tts.synthesize_elevenlabs(nb, work_dir / "vo")
-        except tts.ElevenLabsNotConfigured:
-            tts.synthesize_local_fallback(nb, work_dir / "vo")
+@app.post("/projects/{project_id}/preview")
+def preview_project(project_id: str, req: PreviewRequest) -> dict:
+    """Fast, cache-reused preview render. Point 6: this NEVER writes into
+    the project's final-export output directory -- only under the managed
+    cache dir, keyed by a content hash of the current timeline so repeated
+    calls with no real edit reuse the existing file instead of rebuilding."""
+    timeline, media = _load_timeline_and_media(project_id, req.media_id)
+    cache_dir = CACHE_DIR / project_id
+    result = pipeline.render_preview(timeline, media, cache_dir, sfx_density=req.sfx_density)
+    return result
 
-    captions = ffmpeg_render.select_kinetic_caption_words(timeline.narration)
 
-    assets = sfx_library.build_and_register_library(work_dir / "sfx")
-    for a in assets:
-        db.upsert_audio_asset(a)
-    asset_ids = {a.name: a.id for a in assets}
-    asset_paths = {a.id: a.file_path for a in assets}
-    music_asset = sfx_library.build_music_loop(work_dir / "music" / "signature.wav", duration_s=20)
-    db.upsert_audio_asset(music_asset)
-    asset_paths[music_asset.id] = music_asset.file_path
+# ---- export final video (the ONLY action that writes a finished MP4 to
+# the user's chosen output location) ----
 
-    if timeline.sound_cue_plan:
-        cues.assign_assets(timeline.sound_cue_plan, asset_ids, density=req.sfx_density)
-    sfx_items = [
-        (asset_paths[c.audio_asset_id], c.output_start_ms, c.gain_db)
-        for c in (timeline.sound_cue_plan.cues if timeline.sound_cue_plan else [])
-        if c.audio_asset_id in asset_paths
-    ]
-    sfx_track = mix.place_sounds_on_track(sfx_items, timeline.total_duration_sec, work_dir / "sfx_bus.wav")
-    vo_items = [
-        (nb.audio_path, int(nb.output_start_sec * 1000), 0.0)
-        for nb in timeline.narration if nb.audio_path
-    ]
-    voice_track = mix.place_sounds_on_track(vo_items, timeline.total_duration_sec, work_dir / "voice_bus.wav")
-    game_track = mix.extract_game_audio(media["path"], timeline.total_duration_sec, work_dir / "game_bus.wav")
-    music_track = mix.loop_music(music_asset.file_path, timeline.total_duration_sec, work_dir / "music_bus_raw.wav")
-    ducked = mix.duck_against_voice(music_track, voice_track, work_dir / "music_bus_ducked.wav")
-    final_raw = mix.mix_stems([voice_track, sfx_track, game_track, ducked], work_dir / "final_mix_raw.wav")
-    final_audio = mix.normalize_to_target(final_raw, work_dir / "final_mix.wav", target_lufs=req.target_lufs)
 
-    cutout_png = make_cutout_png(work_dir / "cutout.png")
-    out_video = ffmpeg_render.render(
-        media_path=media["path"],
-        scenes=timeline.scenes,
-        motions=timeline.motion,
-        graphics=timeline.graphics,
-        captions=captions,
-        cutout_png=cutout_png,
-        final_audio_path=final_audio,
-        out_path=work_dir / "final.mp4",
-        preset=timeline.preset,
-        width=media["width"] if timeline.preset == AspectPreset.LONG_FORM_STORY else media["width"],
-        height=media["height"],
-        fps=media["fps"],
+class ExportFinalVideoRequest(BaseModel):
+    media_id: str
+    sfx_density: str = "balanced"
+    output_dir: str | None = None  # defaults to backend/data/exports/<project_id>/
+    filename: str = "final.mp4"
+    also_export_sidecars: bool = True  # SRT/OTIO/FCPXML/timeline.json alongside
+
+
+@app.post("/projects/{project_id}/export/final-video")
+def export_final_video(project_id: str, req: ExportFinalVideoRequest) -> dict:
+    timeline, media = _load_timeline_and_media(project_id, req.media_id)
+    cache_dir = CACHE_DIR / project_id
+    output_dir = Path(req.output_dir) if req.output_dir else (EXPORTS_DIR / project_id)
+
+    pre_existing = set(output_dir.glob("*.mp4")) if output_dir.exists() else set()
+
+    try:
+        result = pipeline.render_final_export(
+            timeline, media, cache_dir, output_dir, req.filename, sfx_density=req.sfx_density
+        )
+    except RuntimeError as e:
+        db.insert_final_export(
+            {"id": db_new_export_id(), "project_id": project_id, "output_path": str(output_dir / req.filename), "status": "failed_qc", "error": str(e)}
+        )
+        raise HTTPException(500, str(e))
+
+    if req.also_export_sidecars:
+        result["sidecars"] = pipeline.export_sidecars(timeline, media["path"], output_dir, Path(req.filename).stem)
+
+    db.insert_final_export(
+        {
+            "id": db_new_export_id(),
+            "project_id": project_id,
+            "output_path": result["video_path"],
+            "status": "finalized",
+        }
     )
-
-    report = mix.loudness_report(final_audio)
-    db.upsert_timeline(timeline)
 
     project = Project.model_validate_json(db.get_project(project_id))
     project.status = ProjectStatus.rendered
     db.upsert_project(project)
 
-    return {"video_path": out_video, "audio_mix_path": final_audio, "loudness_report": report}
+    after = set(output_dir.glob("*.mp4"))
+    result["new_mp4_files_in_output_dir"] = sorted(str(p) for p in (after - pre_existing))
+    return result
+
+
+def db_new_export_id() -> str:
+    from app.schemas import new_id
+    return new_id("finalexp")
+
+
+@app.get("/projects/{project_id}/export/final-video/history")
+def final_video_history(project_id: str) -> list[dict]:
+    return db.list_final_exports(project_id)
+
+
+# ---- narration (ElevenLabs/local-fallback), regenerate one block at a time ----
+
+
+@app.post("/projects/{project_id}/narration/{block_id}/regenerate")
+def regenerate_narration_block(project_id: str, block_id: str) -> dict:
+    """Regenerates exactly one NarrationBlock's audio (never a full
+    render) and re-syncs every downstream timestamp so SFX/captions/duck
+    stay aligned -- point 3's "regenerate one block at a time ... align
+    SFX, music duck and captions after modifications"."""
+    timeline_raw = db.get_timeline_for_project(project_id)
+    if not timeline_raw:
+        raise HTTPException(404, "no timeline for project")
+    timeline = TimelineDocument.model_validate_json(timeline_raw)
+
+    block = next((n for n in timeline.narration if n.id == block_id), None)
+    if block is None:
+        raise HTTPException(404, "narration block not found")
+
+    cache_dir = CACHE_DIR / project_id / "vo"
+    old_duration = block.duration_sec
+    try:
+        tts_mod.synthesize_elevenlabs(block, cache_dir)
+    except tts_mod.ElevenLabsNotConfigured:
+        tts_mod.synthesize_local_fallback(block, cache_dir)
+
+    resync_after_narration_change(timeline, block_id)
+    version = db.upsert_timeline(timeline)
+
+    return {
+        "ok": True,
+        "version": version,
+        "block": json.loads(block.model_dump_json()),
+        "old_duration_sec": old_duration,
+        "new_duration_sec": block.duration_sec,
+    }
+
+
+@app.get("/projects/{project_id}/voice-coverage-report")
+def voice_coverage_report(project_id: str) -> dict:
+    """Builds (or reuses, from cache) the voice bus for the CURRENT
+    timeline and runs real silence detection on it -- actual rendered
+    audio occupancy, not just summed planned durations."""
+    timeline_raw = db.get_timeline_for_project(project_id)
+    if not timeline_raw:
+        raise HTTPException(404, "no timeline for project")
+    timeline = TimelineDocument.model_validate_json(timeline_raw)
+
+    cache_dir = CACHE_DIR / project_id / "vo"
+    for nb in timeline.narration:
+        if nb.duration_sec <= 0:
+            nb.duration_sec = tts_mod.estimate_duration_sec(nb.text)
+        if not nb.audio_path or not Path(nb.audio_path).exists():
+            try:
+                tts_mod.synthesize_elevenlabs(nb, cache_dir)
+            except tts_mod.ElevenLabsNotConfigured:
+                tts_mod.synthesize_local_fallback(nb, cache_dir)
+    db.upsert_timeline(timeline)
+
+    vo_items = [(nb.audio_path, int(nb.output_start_sec * 1000), 0.0) for nb in timeline.narration if nb.audio_path]
+    voice_track = mix.place_sounds_on_track(
+        vo_items, timeline.total_duration_sec, CACHE_DIR / project_id / "voice_report_bus.wav"
+    )
+    return mix.voice_coverage_gap_report(voice_track, timeline.total_duration_sec)
+
+
+# ---- motion: speed ramp ----
+
+
+class SpeedRampRequest(BaseModel):
+    rate: float  # >1 = sped up, <1 = slow motion
+
+
+@app.post("/projects/{project_id}/scenes/{scene_id}/speed-ramp")
+def speed_ramp_scene(project_id: str, scene_id: str, req: SpeedRampRequest) -> dict:
+    timeline_raw = db.get_timeline_for_project(project_id)
+    if not timeline_raw:
+        raise HTTPException(404, "no timeline for project")
+    timeline = TimelineDocument.model_validate_json(timeline_raw)
+
+    try:
+        apply_speed_ramp(timeline, scene_id, req.rate)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+    version = db.upsert_timeline(timeline)
+    return {"ok": True, "version": version, "new_total_duration_sec": timeline.total_duration_sec}
 
 
 # ---- export ----
@@ -317,6 +450,44 @@ def approve_skill(skill_id: str) -> dict:
 @app.get("/skills/{skill_id}/versions")
 def skill_versions(skill_id: str) -> list[dict]:
     return [json.loads(v) for v in db.list_skill_versions(skill_id)]
+
+
+@app.post("/skills/learn-from-reference")
+async def learn_from_reference(file: UploadFile, skill_id: str, title: str) -> dict:
+    """Uploads a reference/tutorial video, measures its real pacing via the
+    same scene-cut detector used on a project's own footage, and stages a
+    proposed skill -- disabled until POST /skills/{id}/approve. Nothing
+    about captions/SFX/motion style is claimed; see needs_manual_recipe."""
+    from app.learning.reference_learner import propose_skill_from_reference
+
+    dest_dir = DATA_DIR / "reference_uploads"
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    dest_path = dest_dir / file.filename
+    with dest_path.open("wb") as f:
+        shutil.copyfileobj(file.file, f)
+
+    try:
+        info = ffprobe_util.probe(dest_path)
+    except ffprobe_util.ProbeError as e:
+        raise HTTPException(400, str(e))
+
+    manifest, profile, analysis = propose_skill_from_reference(dest_path, skill_id, title)
+
+    dest_skill_dir = SKILLS_LIBRARY_DIR / manifest.id
+    dest_skill_dir.mkdir(parents=True, exist_ok=True)
+    (dest_skill_dir / "manifest.json").write_text(manifest.model_dump_json(indent=2))
+    db.upsert_skill(manifest)
+
+    memory_store.remember(
+        MemoryRecordKind.reference_style_analysis, manifest.id, json.loads(profile.model_dump_json())
+    )
+
+    return {
+        "manifest": json.loads(manifest.model_dump_json()),
+        "style_profile": json.loads(profile.model_dump_json()),
+        "analysis": analysis,
+        "media_probe": info,
+    }
 
 
 # ---- memory / creative brief ----

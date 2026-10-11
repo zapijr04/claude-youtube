@@ -22,12 +22,14 @@ class Preset:
     name: str
     category: SoundCueCategory
     components: list[Component]
+    pitch_semitones: float = 0.0
+    speed: float = 1.0
 
 
 # >= 25 named presets across the 18 trigger categories, per spec A2.
 PRESETS: list[Preset] = [
     Preset("egg_open_quick_pop", SoundCueCategory.EGG_OPEN, [("click_soft", -250, -2), ("pop", 0, 0)]),
-    Preset("egg_open_rare_crack", SoundCueCategory.EGG_OPEN, [("click_hard", -300, 0), ("coin_chime", 50, -1)]),
+    Preset("egg_open_rare_crack", SoundCueCategory.EGG_OPEN, [("click_hard", -300, 0), ("coin_chime", 50, -1)], pitch_semitones=3.0),
     Preset("steal_success_snatch", SoundCueCategory.STEAL_SUCCESS, [("whoosh_rise", -120, -1), ("countdown_bleep", 0, -3)]),
     Preset("steal_success_reward", SoundCueCategory.STEAL_SUCCESS, [("coin_chime", 0, -1)]),
     Preset("steal_failed_scratch", SoundCueCategory.STEAL_FAILED, [("error_beep", 0, -2)]),
@@ -41,9 +43,9 @@ PRESETS: list[Preset] = [
     Preset("circle_highlight_blip", SoundCueCategory.CIRCLE_HIGHLIGHT, [("countdown_bleep", 0, -6)]),
     Preset("counter_increment_tick", SoundCueCategory.COUNTER_INCREMENT, [("ticking", 0, -4)]),
     Preset("timer_10s_bleep", SoundCueCategory.TIMER_10_SECONDS, [("countdown_bleep", 0, -3)]),
-    Preset("big_reveal_riser_chime", SoundCueCategory.BIG_REVEAL, [("rising_tension", -400, -2), ("coin_chime", 0, 0)]),
+    Preset("big_reveal_riser_chime", SoundCueCategory.BIG_REVEAL, [("rising_tension", -400, -2), ("coin_chime", 0, 0)], pitch_semitones=2.0),
     Preset("big_reveal_riser_impact", SoundCueCategory.BIG_REVEAL, [("rising_tension", -500, -3), ("sub_bass_hit", 0, -1)]),
-    Preset("funny_fail_bop", SoundCueCategory.FUNNY_FAIL, [("pop", 0, -3), ("error_beep", 80, -8)]),
+    Preset("funny_fail_bop", SoundCueCategory.FUNNY_FAIL, [("pop", 0, -3), ("error_beep", 80, -8)], speed=1.25),
     Preset("transition_whoosh", SoundCueCategory.TRANSITION, [("whoosh_fall", 0, -3)]),
     Preset("transition_glitch", SoundCueCategory.TRANSITION, [("digital_glitch", 0, -4)]),
     Preset("money_gain_chime", SoundCueCategory.MONEY_GAIN, [("coin_chime", 0, -1)]),
@@ -74,6 +76,7 @@ def assign_assets(
     plan.density = density
     max_per_min = DENSITY_MAX_PER_MINUTE.get(density, 20)
     last_fired_ms: dict[SoundCueCategory, int] = {}
+    occurrence_count: dict[SoundCueCategory, int] = {}
     expanded: list[SoundCue] = []
     minute_bucket: dict[int, int] = {}
 
@@ -92,6 +95,13 @@ def assign_assets(
         if minute_bucket.get(minute, 0) >= max_per_min:
             continue
 
+        occ = occurrence_count.get(cue.category, 0)
+        # Small deterministic pitch jitter per repeat occurrence of the same
+        # category, on top of the preset's own pitch -- so the 3rd "chase
+        # tick" in a row isn't bit-for-bit identical to the 1st, without
+        # needing a bigger sound library. Cycles -1.2 .. +1.2 semitones.
+        jitter = ((occ % 5) - 2) * 0.6
+
         for asset_name, offset_ms, gain_db in preset.components:
             asset_id = asset_ids_by_name.get(asset_name)
             if asset_id is None:
@@ -104,6 +114,8 @@ def assign_assets(
                     output_start_ms=start_ms,
                     duration_ms=cue.duration_ms,
                     gain_db=gain_db,
+                    pitch_semitones=preset.pitch_semitones + jitter,
+                    speed=preset.speed,
                     trigger_source=cue.trigger_source,
                     source_timestamp_sec=cue.source_timestamp_sec,
                     evidence=cue.evidence,
@@ -113,6 +125,7 @@ def assign_assets(
             )
         last_fired_ms[cue.category] = cue.output_start_ms
         minute_bucket[minute] = minute_bucket.get(minute, 0) + 1
+        occurrence_count[cue.category] = occ + 1
 
     plan.cues = expanded
     return plan

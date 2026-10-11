@@ -1,5 +1,81 @@
 # Decisions log
 
+## 2026 upgrade pass (addendum points 1-6)
+
+- **Referenced spec file not found, proceeded on the pasted addendum
+  instead of blocking.** The user's prompt said to read
+  `NOOBZY_AI_STUDIO_CLAUDE_CODE_PROMPT.md` "completely". It does not exist
+  in this repo, the home directory, or `/mnt/user-data/uploads` -- checked
+  all three before concluding that. The same message included a detailed,
+  explicitly-superseding addendum (points 1-6) pasted directly into the
+  prompt, which was specific enough to implement against. Told the user
+  plainly and moved on rather than stalling on a file that isn't there.
+- **Point 6 (non-negotiable) redesign: preview vs. final export are the
+  same pipeline, different endpoints, different write targets.** The
+  previous build's single `/render` endpoint wrote a "final.mp4" to disk on
+  every call -- exactly the anti-pattern point 6 forbids. Rather than bolt
+  an "are we exporting?" flag onto the old function, split it at the
+  module boundary: `app/pipeline.py` has one shared
+  `_build_audio_and_video` and two public entry points,
+  `render_preview` (cache-dir only, content-hash-keyed reuse) and
+  `render_final_export` (temp file, real QC gate, atomic move into the
+  caller's chosen directory). This makes "preview never touches the output
+  dir" a structural property of which function got called, not a runtime
+  check that could be forgotten in a future edit.
+- **Why a `timeline_versions` table instead of reusing `skill_versions`'
+  pattern inline.** Edits are now explicitly non-destructive (point 6's
+  "non-negotiable" framing), so every `PUT /timeline` needed real history,
+  not just the latest row. Added a dedicated migration (`db.py`
+  migration #2) rather than overloading the existing `timeline_documents`
+  table, so `GET .../timeline/versions` and `POST .../timeline/rollback`
+  are simple, real SQL -- and the regression test could assert on exact
+  version counts across a process restart.
+- **Found and fixed a real bug in the first draft of `shift_after`.** It
+  computed `timeline.total_duration_sec = max(old, old + delta)`, which
+  silently blocked the duration from ever *shrinking* -- so a 2x speed
+  ramp correctly shortened the ramped scene's own window but left
+  `total_duration_sec` unchanged. Caught immediately by the speed-ramp
+  test (expected 69.0s, got 75.0s), not assumed correct. Fixed to
+  `max(0.0, old + delta)`.
+- **`SoundCue.pitch_semitones`/`speed` existed in the schema since the
+  original build but were never read by the mixer** -- `place_sounds_on_track`
+  only applied `gain_db`. This was the concrete gap behind addendum point
+  1's "tune ... pitch". Added `place_cues_on_track` with a real
+  `asetrate`+`aresample`+`atempo` pitch-shift chain (classic
+  independent-pitch-shift trick: resample to bend pitch, then atempo back
+  to restore duration) plus a second `atempo` stage for `speed`, each
+  verified audible by direct RMS measurement before being wired into the
+  render pipeline.
+- **FFmpeg's `%{eif:...}` drawtext macro for the countdown timer, verified
+  by CLI before use.** `floor`/`clip` are already known-unavailable in this
+  build's generic expression evaluator (see the Phase-1 decisions below);
+  `%{eif:expr:format}` is a separate drawtext-specific text-expansion
+  mechanism and does work here, confirmed by rendering three frames of a
+  10-second countdown and visually checking the numbers actually decrease
+  (9 → 7 → ...), not just that the command exited zero.
+- **Tracked-arrow glyph needed an explicit font.** The first attempt used
+  U+27A4 (➤, Dingbats block) with no explicit `font=`, which rendered as a
+  visible "NO GLYPH" placeholder box in a frame grab -- caught by actually
+  looking at the frame, not by the ffmpeg exit code (it exits 0 either
+  way). Switched to U+2192 (→, the much more broadly-supported Arrows
+  block) with `font='DejaVu Sans'` explicitly set, re-verified by another
+  frame grab showing the real glyph.
+- **Reference-video learning stays honestly scoped to pacing.** No vision
+  or audio-classification model is available in this environment. Rather
+  than either skip point 4 entirely or fake a caption/SFX/style analysis,
+  `app/learning/reference_learner.py` does the one thing it can do for
+  real -- run the same scene-cut detector used on a project's own footage
+  against the reference video and measure real shot-length/cut-frequency
+  stats -- and explicitly lists everything it could NOT infer
+  (`NOT_INFERABLE` / `needs_manual_recipe=True`) rather than omitting the
+  limitation silently.
+- **Audio stems now copied into the final export's output directory**,
+  not just returned in the API response as before -- closed during this
+  pass rather than left as a documented gap, since it was a small,
+  mechanical fix (`shutil.copy` from the cache's stem WAVs into
+  `<output>/<name>_stems/`) once the export pipeline already had the stem
+  paths in hand.
+
 Running log of notable choices made while building NOOBZY AI STUDIO, most
 recent first-built at the bottom of each section is not implied -- entries
 are grouped by subsystem.

@@ -39,19 +39,65 @@ def test_full_project_lifecycle_over_http(client, long_fixture):
     assert r.status_code == 200
     assert len(r.json()["scenes"]) == len(analysis["windows"])
 
-    r = client.post(f"/projects/{pid}/render", json={"media_id": mid})
+    # Point 6: preview is cheap/cached and must never touch the export dir.
+    r = client.post(f"/projects/{pid}/preview", json={"media_id": mid})
     assert r.status_code == 200
-    render = r.json()
-    assert render["loudness_report"]["clipping_detected"] is False
+    preview = r.json()
+    assert preview["loudness_report"]["clipping_detected"] is False
+    assert "voice_coverage_report" in preview
 
     from app.media.ffprobe_util import probe
-    info = probe(render["video_path"])
+    info = probe(preview["video_path"])
     assert info["width"] == 1920 and info["has_audio"]
+
+    # The ONE explicit final-export action actually writes the output MP4.
+    r = client.post(f"/projects/{pid}/export/final-video", json={"media_id": mid})
+    assert r.status_code == 200
+    final = r.json()
+    final_info = probe(final["video_path"])
+    assert final_info["has_audio"] and final_info["duration_sec"] > 0
+    assert len(final["new_mp4_files_in_output_dir"]) == 1
+
+    r = client.get(f"/projects/{pid}/export/final-video/history")
+    assert r.status_code == 200
+    assert r.json()[-1]["status"] == "finalized"
 
     r = client.get(f"/projects/{pid}/export/otio", params={"media_id": mid})
     assert r.status_code == 200
     r = client.get(f"/projects/{pid}/export/srt", params={"mode": "selective"})
     assert r.status_code == 200
+
+
+def test_narration_regen_speed_ramp_and_gap_report_over_http(client, long_fixture):
+    r = client.post("/projects", json={"name": "V2 Features", "preset": "LONG_FORM_STORY", "target_duration_sec": 75})
+    pid = r.json()["id"]
+    with open(long_fixture["path"], "rb") as f:
+        r = client.post(f"/projects/{pid}/media", files={"file": ("fixture_long.mp4", f, "video/mp4")})
+    mid = r.json()["id"]
+    r = client.post(f"/projects/{pid}/analyze", params={"media_id": mid})
+    assert r.status_code == 200
+
+    r = client.get(f"/projects/{pid}/voice-coverage-report")
+    assert r.status_code == 200
+    report = r.json()
+    assert "voice_coverage_ratio" in report
+
+    timeline = client.get(f"/projects/{pid}/timeline").json()
+    scene_id = timeline["scenes"][0]["id"]
+    r = client.post(f"/projects/{pid}/scenes/{scene_id}/speed-ramp", json={"rate": 2.0})
+    assert r.status_code == 200
+    assert r.json()["new_total_duration_sec"] < timeline["total_duration_sec"]
+
+    timeline2 = client.get(f"/projects/{pid}/timeline").json()
+    if timeline2["narration"]:
+        block_id = timeline2["narration"][0]["id"]
+        r = client.post(f"/projects/{pid}/narration/{block_id}/regenerate")
+        assert r.status_code == 200
+        assert r.json()["ok"] is True
+
+    r = client.get(f"/projects/{pid}/timeline/versions")
+    assert r.status_code == 200
+    assert len(r.json()) >= 3  # analyze + speed-ramp + (maybe) narration regen
 
 
 def test_skills_endpoints_over_http(client):

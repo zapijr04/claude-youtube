@@ -60,6 +60,67 @@ def place_sounds_on_track(
     return str(out_path)
 
 
+def place_cues_on_track(
+    cues: list,
+    asset_paths: dict[str, str],
+    total_duration_s: float,
+    out_path: str | Path,
+    sr: int = 48000,
+) -> str:
+    """Like place_sounds_on_track, but for SoundCue objects -- actually
+    applies each cue's pitch_semitones and speed, not just gain/placement.
+    Pitch shift uses asetrate+aresample+atempo (classic independent
+    pitch-shift trick: resample to bend pitch, then atempo back to the
+    original duration so only the pitch changed); `speed` is then layered
+    on top via a second atempo stage. Both were a schema field that
+    existed but was silently ignored by the old place_sounds_on_track --
+    this is the real fix."""
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    usable = [c for c in cues if c.audio_asset_id in asset_paths]
+    if not usable:
+        return place_sounds_on_track([], total_duration_s, out_path, sr)
+
+    cmd = ["ffmpeg", "-y"]
+    for c in usable:
+        cmd += ["-i", asset_paths[c.audio_asset_id]]
+
+    parts = []
+    labels = []
+    for i, c in enumerate(usable):
+        stage_filters = []
+        if abs(c.pitch_semitones) > 1e-6:
+            ratio = 2 ** (c.pitch_semitones / 12.0)
+            shifted_rate = int(sr * ratio)
+            stage_filters.append(f"asetrate={shifted_rate}")
+            stage_filters.append(f"aresample={sr}")
+            stage_filters.append(f"atempo={1.0 / ratio:.6f}")
+        if abs(c.speed - 1.0) > 1e-6:
+            # atempo is only valid in [0.5, 2.0]; cue speeds are expected
+            # to stay within that range for a short SFX hit.
+            speed = min(2.0, max(0.5, c.speed))
+            stage_filters.append(f"atempo={speed:.6f}")
+        if c.gain_db:
+            stage_filters.append(f"volume={c.gain_db}dB")
+        stage_filters.append(f"adelay={max(0, c.output_start_ms)}:all=1")
+        stage_filters.append("apad")
+        parts.append(f"[{i}:a]{','.join(stage_filters)}[s{i}]")
+        labels.append(f"[s{i}]")
+
+    mix = "".join(labels) + f"amix=inputs={len(usable)}:normalize=0:dropout_transition=0[mixraw];[mixraw]alimiter=limit=0.9[mixed]"
+    filter_complex = ";".join(parts) + ";" + mix
+
+    cmd += [
+        "-filter_complex", filter_complex,
+        "-map", "[mixed]", "-t", f"{total_duration_s:.3f}",
+        "-ar", str(sr), "-ac", "1",
+        str(out_path),
+    ]
+    _run(cmd)
+    return str(out_path)
+
+
 def extract_game_audio(src_video: str | Path, total_duration_s: float, out_path: str | Path, gain_db: float = -6.0) -> str:
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -153,6 +214,48 @@ def normalize_to_target(
         "-ar", "48000", str(out_path),
     ])
     return str(out_path)
+
+
+def voice_coverage_gap_report(
+    voice_track_path: str | Path, total_duration_s: float, gap_threshold_s: float = 1.25,
+    silence_db: float = -35.0,
+) -> dict:
+    """Real silence detection on the ACTUAL rendered voice bus (FFmpeg's
+    `silencedetect` filter, not just summed planned NarrationBlock
+    durations) -- per spec: "calculate actual voice-speech occupancy from
+    generated audio, not only intended script duration." Returns every
+    silent interval plus which ones exceed `gap_threshold_s` (the ones that
+    read as an unintentional dead-air stretch rather than a deliberate
+    beat), and an overall speech-coverage ratio."""
+    cmd = [
+        "ffmpeg", "-i", str(voice_track_path),
+        "-af", f"silencedetect=noise={silence_db}dB:d=0.3",
+        "-f", "null", "-",
+    ]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    starts = [float(m) for m in re.findall(r"silence_start:\s*(-?\d+\.?\d*)", result.stderr)]
+    ends = [float(m) for m in re.findall(r"silence_end:\s*(-?\d+\.?\d*)", result.stderr)]
+
+    # silencedetect may not emit a trailing silence_end if the file ends
+    # silent; close it off at total_duration_s so coverage math stays sane.
+    if len(ends) < len(starts):
+        ends.append(total_duration_s)
+
+    gaps = [
+        {"start_sec": round(s, 2), "end_sec": round(e, 2), "duration_sec": round(e - s, 2)}
+        for s, e in zip(starts, ends)
+    ]
+    total_silence = sum(g["duration_sec"] for g in gaps)
+    coverage_ratio = max(0.0, 1.0 - (total_silence / total_duration_s)) if total_duration_s > 0 else 0.0
+    over_threshold = [g for g in gaps if g["duration_sec"] > gap_threshold_s]
+
+    return {
+        "total_duration_sec": round(total_duration_s, 2),
+        "voice_coverage_ratio": round(coverage_ratio, 4),
+        "all_silent_gaps": gaps,
+        "gaps_over_threshold": over_threshold,
+        "gap_threshold_sec": gap_threshold_s,
+    }
 
 
 def loudness_report(path: str | Path) -> dict:

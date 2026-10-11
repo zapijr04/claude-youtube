@@ -82,6 +82,46 @@ _PLACEHOLDER_LINES: dict[str, str] = {
 }
 
 
+def select_windows_for_target_duration(
+    windows: list[tuple[float, float]], target_duration_sec: float
+) -> list[tuple[float, float]]:
+    """Honest, documented heuristic for the "~2h raw -> ~12m story" mode.
+
+    No vision/engagement model is available in this environment, so this
+    does NOT claim to find "the best" or "most exciting" moments -- that
+    would be fabricating editorial judgment the app doesn't actually have.
+    Instead: always keep the first window (the hook) and the last window
+    (the payoff), then greedily add the *shortest* remaining windows first,
+    on the defensible-but-explicitly-heuristic theory that a short window
+    between two scene cuts means more cut frequency / more visual change
+    per second than a long static window -- a real, measured signal (scene
+    cuts are real), even though "short = more interesting" is a heuristic,
+    not a certainty. Selected windows are returned back in chronological
+    order so the story stays linear. If the raw total is already within
+    budget, nothing is dropped.
+    """
+    if not windows:
+        return []
+    total = sum(e - s for s, e in windows)
+    if total <= target_duration_sec or len(windows) <= 2:
+        return windows
+
+    first, last = windows[0], windows[-1]
+    middle = windows[1:-1]
+    middle_sorted = sorted(middle, key=lambda w: w[1] - w[0])
+
+    kept = {first, last}
+    running = (first[1] - first[0]) + (last[1] - last[0])
+    for w in middle_sorted:
+        dur = w[1] - w[0]
+        if running + dur > target_duration_sec:
+            continue
+        kept.add(w)
+        running += dur
+
+    return sorted(kept, key=lambda w: w[0])
+
+
 def build_rough_cut_from_scene_cuts(
     project_id: str,
     media_id: str,

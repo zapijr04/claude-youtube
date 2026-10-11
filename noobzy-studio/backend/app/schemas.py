@@ -89,6 +89,11 @@ class Scene(BaseModel):
     confidence: float = Field(ge=0.0, le=1.0, default=0.5)
     keep: bool = True
     reason: str = ""
+    playback_rate: float = Field(default=1.0, gt=0.0)
+    """>1.0 = sped up (speed ramp), <1.0 = slow motion. Output duration of
+    this scene becomes (source_out_sec - source_in_sec) / playback_rate.
+    Changing this requires retiming every downstream beat/narration/graphic/
+    motion/sound-cue timestamp -- see app.timeline.retime.apply_speed_ramp."""
 
 
 class StoryBeatKind(str, Enum):
@@ -148,6 +153,7 @@ class GraphicLayerKind(str, Enum):
     comparison_card = "comparison_card"
     end_screen = "end_screen"
     hero_card = "hero_card"
+    arrow = "arrow"
 
 
 class GraphicLayer(BaseModel):
@@ -338,6 +344,9 @@ class TimelineDocument(BaseModel):
     motion: list[MotionPreset] = Field(default_factory=list)
     audio_tracks: list[AudioTrack] = Field(default_factory=list)
     sound_cue_plan: Optional[SoundCuePlan] = None
+    target_lufs: float = -14.0
+    """Persisted project-level mastering target -- part of the editable,
+    autosaved project state, not a one-off render parameter."""
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 

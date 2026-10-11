@@ -96,6 +96,28 @@ MIGRATIONS: list[str] = [
         data_json TEXT NOT NULL
     );
     """,
+    # 0002: non-destructive edit history + final-export tracking (point 6:
+    # edits must only ever touch the autosaved timeline/version history --
+    # never write a "finished" MP4 -- so every PUT of a TimelineDocument is
+    # also appended here, giving real undo/rollback, not just the latest
+    # state.
+    """
+    CREATE TABLE IF NOT EXISTS timeline_versions (
+        project_id TEXT NOT NULL,
+        version INTEGER NOT NULL,
+        data_json TEXT NOT NULL,
+        saved_at TEXT NOT NULL,
+        PRIMARY KEY (project_id, version)
+    );
+    CREATE TABLE IF NOT EXISTS final_exports (
+        id TEXT PRIMARY KEY,
+        project_id TEXT NOT NULL,
+        output_path TEXT NOT NULL,
+        status TEXT NOT NULL,
+        data_json TEXT NOT NULL,
+        created_at TEXT NOT NULL
+    );
+    """,
 ]
 
 
@@ -207,13 +229,31 @@ def list_source_media(project_id: str) -> list[str]:
         return [r["data_json"] for r in rows]
 
 
-def upsert_timeline(doc) -> None:
+def upsert_timeline(doc, keep_history: bool = True) -> int:
+    """Persists the current TimelineDocument AND appends it to
+    timeline_versions (an auto-incrementing per-project version number),
+    so every edit is non-destructive and rollback-able -- this is the one
+    and only place project edits are saved; it never touches a rendered
+    MP4. Returns the new version number."""
     with connect() as conn:
         conn.execute(
             """INSERT INTO timeline_documents (id, project_id, data_json, updated_at) VALUES (?, ?, ?, ?)
                ON CONFLICT(id) DO UPDATE SET data_json=excluded.data_json, updated_at=excluded.updated_at""",
             (doc.id, doc.project_id, dumps(doc), doc.updated_at.isoformat()),
         )
+        version = 0
+        if keep_history:
+            row = conn.execute(
+                "SELECT COALESCE(MAX(version), 0) AS v FROM timeline_versions WHERE project_id=?",
+                (doc.project_id,),
+            ).fetchone()
+            version = row["v"] + 1
+            conn.execute(
+                """INSERT INTO timeline_versions (project_id, version, data_json, saved_at)
+                   VALUES (?, ?, ?, datetime('now'))""",
+                (doc.project_id, version, dumps(doc)),
+            )
+        return version
 
 
 def get_timeline_for_project(project_id: str) -> str | None:
@@ -223,6 +263,41 @@ def get_timeline_for_project(project_id: str) -> str | None:
             (project_id,),
         ).fetchone()
         return row["data_json"] if row else None
+
+
+def list_timeline_versions(project_id: str) -> list[dict]:
+    with connect() as conn:
+        rows = conn.execute(
+            "SELECT version, saved_at FROM timeline_versions WHERE project_id=? ORDER BY version",
+            (project_id,),
+        ).fetchall()
+        return [{"version": r["version"], "saved_at": r["saved_at"]} for r in rows]
+
+
+def get_timeline_version(project_id: str, version: int) -> str | None:
+    with connect() as conn:
+        row = conn.execute(
+            "SELECT data_json FROM timeline_versions WHERE project_id=? AND version=?",
+            (project_id, version),
+        ).fetchone()
+        return row["data_json"] if row else None
+
+
+def insert_final_export(record) -> None:
+    with connect() as conn:
+        conn.execute(
+            """INSERT INTO final_exports (id, project_id, output_path, status, data_json, created_at)
+               VALUES (?, ?, ?, ?, ?, datetime('now'))""",
+            (record["id"], record["project_id"], record["output_path"], record["status"], json.dumps(record)),
+        )
+
+
+def list_final_exports(project_id: str) -> list[dict]:
+    with connect() as conn:
+        rows = conn.execute(
+            "SELECT data_json FROM final_exports WHERE project_id=? ORDER BY created_at", (project_id,)
+        ).fetchall()
+        return [json.loads(r["data_json"]) for r in rows]
 
 
 def upsert_skill(manifest, keep_history: bool = True) -> None:
