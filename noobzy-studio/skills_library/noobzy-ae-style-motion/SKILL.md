@@ -1,0 +1,39 @@
+---
+{
+  "id": "noobzy-ae-style-motion",
+  "version": "1.0.0",
+  "title": "Noobzy AE-Style Motion",
+  "description": "Layered animation parameters for premium-feeling effects, implemented honestly (no fake .aep/Fusion claims).",
+  "triggers": [
+    "after effects style",
+    "layered motion"
+  ],
+  "capabilities": [
+    "motion.zoom",
+    "motion.shake",
+    "motion.cutout_overlay"
+  ],
+  "dependencies": [],
+  "allowed_parameters": {},
+  "examples": [
+    "Layer a zoom + cutout + caption pass on the climax beat."
+  ],
+  "provenance": "built_in"
+}
+---
+
+# Noobzy AE-Style Motion
+
+Layered animation parameters for premium-feeling effects, implemented honestly (no fake .aep/Fusion claims).
+
+## Triggers
+- after effects style
+- layered motion
+
+## Capabilities
+- motion.zoom
+- motion.shake
+- motion.cutout_overlay
+
+## Examples
+- Layer a zoom + cutout + caption pass on the climax beat.

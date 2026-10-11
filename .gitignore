@@ -27,6 +27,15 @@ Thumbs.db
 .claude/
 .tmp/
 
+# NOOBZY AI STUDIO (noobzy-studio/)
+noobzy-studio/backend/data/
+noobzy-studio/backend/.pytest_cache/
+noobzy-studio/backend/tests/fixtures/generated/
+noobzy-studio/desktop/node_modules/
+noobzy-studio/desktop/dist/
+noobzy-studio/desktop/electron-dist/
+*.db
+
 # YouTube API credentials (never commit)
 *oauth_token*.json
 *client_secret*.json

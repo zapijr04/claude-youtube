@@ -1,0 +1,1083 @@
+{
+  "schema_version": "1.0.0",
+  "id": "tl_37d061663884",
+  "project_id": "demo_long_16x9",
+  "preset": "LONG_FORM_STORY",
+  "width": 1920,
+  "height": 1080,
+  "fps": 30.0,
+  "total_duration_sec": 75.0,
+  "scenes": [
+    {
+      "id": "scene_dcb24f17ef5f",
+      "media_id": "media_long_16x9",
+      "source_in_sec": 0.0,
+      "source_out_sec": 8.0,
+      "evidence_kind": "simulated_annotation",
+      "confidence": 0.95,
+      "keep": true,
+      "reason": "annotated segment: HOOK: I TRIED TO ROB EVERY PLAYER"
+    },
+    {
+      "id": "scene_d898388f11e4",
+      "media_id": "media_long_16x9",
+      "source_in_sec": 8.0,
+      "source_out_sec": 18.0,
+      "evidence_kind": "simulated_annotation",
+      "confidence": 0.95,
+      "keep": true,
+      "reason": "annotated segment: GOAL: STEAL 6 EGGS - 0/6"
+    },
+    {
+      "id": "scene_4c12257a35f7",
+      "media_id": "media_long_16x9",
+      "source_in_sec": 18.0,
+      "source_out_sec": 30.0,
+      "evidence_kind": "simulated_annotation",
+      "confidence": 0.95,
+      "keep": true,
+      "reason": "annotated segment: CHASE: GUARD INCOMING"
+    },
+    {
+      "id": "scene_725e36401525",
+      "media_id": "media_long_16x9",
+      "source_in_sec": 30.0,
+      "source_out_sec": 36.0,
+      "evidence_kind": "simulated_annotation",
+      "confidence": 0.95,
+      "keep": true,
+      "reason": "annotated segment: NEAR MISS"
+    },
+    {
+      "id": "scene_c65d6bc902ef",
+      "media_id": "media_long_16x9",
+      "source_in_sec": 36.0,
+      "source_out_sec": 44.0,
+      "evidence_kind": "simulated_annotation",
+      "confidence": 0.95,
+      "keep": true,
+      "reason": "annotated segment: CAUGHT - FAILED ATTEMPT"
+    },
+    {
+      "id": "scene_a05b5c691d41",
+      "media_id": "media_long_16x9",
+      "source_in_sec": 44.0,
+      "source_out_sec": 54.0,
+      "evidence_kind": "simulated_annotation",
+      "confidence": 0.95,
+      "keep": true,
+      "reason": "annotated segment: STRATEGY CHANGE"
+    },
+    {
+      "id": "scene_1bb487f360af",
+      "media_id": "media_long_16x9",
+      "source_in_sec": 54.0,
+      "source_out_sec": 65.0,
+      "evidence_kind": "simulated_annotation",
+      "confidence": 0.95,
+      "keep": true,
+      "reason": "annotated segment: CLIMAX: FINAL EGG - 6/6"
+    },
+    {
+      "id": "scene_676ab87a5f25",
+      "media_id": "media_long_16x9",
+      "source_in_sec": 65.0,
+      "source_out_sec": 75.0,
+      "evidence_kind": "simulated_annotation",
+      "confidence": 0.95,
+      "keep": true,
+      "reason": "annotated segment: PAYOFF: ALL 6 STOLEN"
+    }
+  ],
+  "beats": [
+    {
+      "id": "beat_843df9fccb8a",
+      "kind": "hook",
+      "output_start_sec": 0.0,
+      "output_end_sec": 8.0,
+      "source_scene_ids": [
+        "scene_dcb24f17ef5f"
+      ],
+      "summary": "HOOK: I TRIED TO ROB EVERY PLAYER"
+    },
+    {
+      "id": "beat_17106a3cfcec",
+      "kind": "goal",
+      "output_start_sec": 8.0,
+      "output_end_sec": 18.0,
+      "source_scene_ids": [
+        "scene_d898388f11e4"
+      ],
+      "summary": "GOAL: STEAL 6 EGGS - 0/6"
+    },
+    {
+      "id": "beat_3db34221d5b3",
+      "kind": "attempt",
+      "output_start_sec": 18.0,
+      "output_end_sec": 30.0,
+      "source_scene_ids": [
+        "scene_4c12257a35f7"
+      ],
+      "summary": "CHASE: GUARD INCOMING"
+    },
+    {
+      "id": "beat_60d31c5857c0",
+      "kind": "complication",
+      "output_start_sec": 30.0,
+      "output_end_sec": 36.0,
+      "source_scene_ids": [
+        "scene_725e36401525"
+      ],
+      "summary": "NEAR MISS"
+    },
+    {
+      "id": "beat_b318591705e6",
+      "kind": "setback",
+      "output_start_sec": 36.0,
+      "output_end_sec": 44.0,
+      "source_scene_ids": [
+        "scene_c65d6bc902ef"
+      ],
+      "summary": "CAUGHT - FAILED ATTEMPT"
+    },
+    {
+      "id": "beat_546ad5a94d78",
+      "kind": "strategy",
+      "output_start_sec": 44.0,
+      "output_end_sec": 54.0,
+      "source_scene_ids": [
+        "scene_a05b5c691d41"
+      ],
+      "summary": "STRATEGY CHANGE"
+    },
+    {
+      "id": "beat_25ffae38a0a9",
+      "kind": "climax",
+      "output_start_sec": 54.0,
+      "output_end_sec": 65.0,
+      "source_scene_ids": [
+        "scene_1bb487f360af"
+      ],
+      "summary": "CLIMAX: FINAL EGG - 6/6"
+    },
+    {
+      "id": "beat_0b7d77f4770b",
+      "kind": "outcome",
+      "output_start_sec": 65.0,
+      "output_end_sec": 75.0,
+      "source_scene_ids": [
+        "scene_676ab87a5f25"
+      ],
+      "summary": "PAYOFF: ALL 6 STOLEN"
+    }
+  ],
+  "narration": [
+    {
+      "id": "vo_998bf395944e",
+      "story_beat_id": "beat_843df9fccb8a",
+      "text": "I tried to rob every player in Steal an Egg -- here's what actually happened.",
+      "provider": "local_fallback",
+      "voice_id": null,
+      "audio_path": "../samples/output/_work_long_16x9/vo/vo_998bf395944e.wav",
+      "output_start_sec": 0.3,
+      "duration_sec": 6.0,
+      "alignment": [
+        {
+          "word": "I",
+          "start_ms": 0,
+          "end_ms": 400,
+          "estimated": true
+        },
+        {
+          "word": "tried",
+          "start_ms": 400,
+          "end_ms": 800,
+          "estimated": true
+        },
+        {
+          "word": "to",
+          "start_ms": 800,
+          "end_ms": 1200,
+          "estimated": true
+        },
+        {
+          "word": "rob",
+          "start_ms": 1200,
+          "end_ms": 1600,
+          "estimated": true
+        },
+        {
+          "word": "every",
+          "start_ms": 1600,
+          "end_ms": 2000,
+          "estimated": true
+        },
+        {
+          "word": "player",
+          "start_ms": 2000,
+          "end_ms": 2400,
+          "estimated": true
+        },
+        {
+          "word": "in",
+          "start_ms": 2400,
+          "end_ms": 2800,
+          "estimated": true
+        },
+        {
+          "word": "Steal",
+          "start_ms": 2800,
+          "end_ms": 3200,
+          "estimated": true
+        },
+        {
+          "word": "an",
+          "start_ms": 3200,
+          "end_ms": 3600,
+          "estimated": true
+        },
+        {
+          "word": "Egg",
+          "start_ms": 3600,
+          "end_ms": 4000,
+          "estimated": true
+        },
+        {
+          "word": "--",
+          "start_ms": 4000,
+          "end_ms": 4400,
+          "estimated": true
+        },
+        {
+          "word": "here's",
+          "start_ms": 4400,
+          "end_ms": 4800,
+          "estimated": true
+        },
+        {
+          "word": "what",
+          "start_ms": 4800,
+          "end_ms": 5200,
+          "estimated": true
+        },
+        {
+          "word": "actually",
+          "start_ms": 5200,
+          "end_ms": 5600,
+          "estimated": true
+        },
+        {
+          "word": "happened.",
+          "start_ms": 5600,
+          "end_ms": 6000,
+          "estimated": true
+        }
+      ],
+      "grounded_in_timestamps": [
+        0.0
+      ],
+      "is_placeholder_voice": true
+    },
+    {
+      "id": "vo_66a6fbbf404d",
+      "story_beat_id": "beat_17106a3cfcec",
+      "text": "The goal: six eggs, zero caught. Counter starts at zero out of six.",
+      "provider": "local_fallback",
+      "voice_id": null,
+      "audio_path": "../samples/output/_work_long_16x9/vo/vo_66a6fbbf404d.wav",
+      "output_start_sec": 8.3,
+      "duration_sec": 6.0,
+      "alignment": [
+        {
+          "word": "The",
+          "start_ms": 0,
+          "end_ms": 461,
+          "estimated": true
+        },
+        {
+          "word": "goal:",
+          "start_ms": 461,
+          "end_ms": 922,
+          "estimated": true
+        },
+        {
+          "word": "six",
+          "start_ms": 922,
+          "end_ms": 1383,
+          "estimated": true
+        },
+        {
+          "word": "eggs,",
+          "start_ms": 1383,
+          "end_ms": 1844,
+          "estimated": true
+        },
+        {
+          "word": "zero",
+          "start_ms": 1844,
+          "end_ms": 2305,
+          "estimated": true
+        },
+        {
+          "word": "caught.",
+          "start_ms": 2305,
+          "end_ms": 2766,
+          "estimated": true
+        },
+        {
+          "word": "Counter",
+          "start_ms": 2766,
+          "end_ms": 3227,
+          "estimated": true
+        },
+        {
+          "word": "starts",
+          "start_ms": 3227,
+          "end_ms": 3688,
+          "estimated": true
+        },
+        {
+          "word": "at",
+          "start_ms": 3688,
+          "end_ms": 4149,
+          "estimated": true
+        },
+        {
+          "word": "zero",
+          "start_ms": 4149,
+          "end_ms": 4610,
+          "estimated": true
+        },
+        {
+          "word": "out",
+          "start_ms": 4610,
+          "end_ms": 5071,
+          "estimated": true
+        },
+        {
+          "word": "of",
+          "start_ms": 5071,
+          "end_ms": 5532,
+          "estimated": true
+        },
+        {
+          "word": "six.",
+          "start_ms": 5532,
+          "end_ms": 5993,
+          "estimated": true
+        }
+      ],
+      "grounded_in_timestamps": [
+        8.0
+      ],
+      "is_placeholder_voice": true
+    },
+    {
+      "id": "vo_b721a81355a5",
+      "story_beat_id": "beat_3db34221d5b3",
+      "text": "A guard spots me immediately and the chase is on.",
+      "provider": "local_fallback",
+      "voice_id": null,
+      "audio_path": "../samples/output/_work_long_16x9/vo/vo_b721a81355a5.wav",
+      "output_start_sec": 18.3,
+      "duration_sec": 6.0,
+      "alignment": [
+        {
+          "word": "A",
+          "start_ms": 0,
+          "end_ms": 600,
+          "estimated": true
+        },
+        {
+          "word": "guard",
+          "start_ms": 600,
+          "end_ms": 1200,
+          "estimated": true
+        },
+        {
+          "word": "spots",
+          "start_ms": 1200,
+          "end_ms": 1800,
+          "estimated": true
+        },
+        {
+          "word": "me",
+          "start_ms": 1800,
+          "end_ms": 2400,
+          "estimated": true
+        },
+        {
+          "word": "immediately",
+          "start_ms": 2400,
+          "end_ms": 3000,
+          "estimated": true
+        },
+        {
+          "word": "and",
+          "start_ms": 3000,
+          "end_ms": 3600,
+          "estimated": true
+        },
+        {
+          "word": "the",
+          "start_ms": 3600,
+          "end_ms": 4200,
+          "estimated": true
+        },
+        {
+          "word": "chase",
+          "start_ms": 4200,
+          "end_ms": 4800,
+          "estimated": true
+        },
+        {
+          "word": "is",
+          "start_ms": 4800,
+          "end_ms": 5400,
+          "estimated": true
+        },
+        {
+          "word": "on.",
+          "start_ms": 5400,
+          "end_ms": 6000,
+          "estimated": true
+        }
+      ],
+      "grounded_in_timestamps": [
+        18.0
+      ],
+      "is_placeholder_voice": true
+    },
+    {
+      "id": "vo_d51d27ba3a13",
+      "story_beat_id": "beat_60d31c5857c0",
+      "text": "That was way too close -- I almost lost it right there.",
+      "provider": "local_fallback",
+      "voice_id": null,
+      "audio_path": "../samples/output/_work_long_16x9/vo/vo_d51d27ba3a13.wav",
+      "output_start_sec": 30.3,
+      "duration_sec": 5.4,
+      "alignment": [
+        {
+          "word": "That",
+          "start_ms": 0,
+          "end_ms": 450,
+          "estimated": true
+        },
+        {
+          "word": "was",
+          "start_ms": 450,
+          "end_ms": 900,
+          "estimated": true
+        },
+        {
+          "word": "way",
+          "start_ms": 900,
+          "end_ms": 1350,
+          "estimated": true
+        },
+        {
+          "word": "too",
+          "start_ms": 1350,
+          "end_ms": 1800,
+          "estimated": true
+        },
+        {
+          "word": "close",
+          "start_ms": 1800,
+          "end_ms": 2250,
+          "estimated": true
+        },
+        {
+          "word": "--",
+          "start_ms": 2250,
+          "end_ms": 2700,
+          "estimated": true
+        },
+        {
+          "word": "I",
+          "start_ms": 2700,
+          "end_ms": 3150,
+          "estimated": true
+        },
+        {
+          "word": "almost",
+          "start_ms": 3150,
+          "end_ms": 3600,
+          "estimated": true
+        },
+        {
+          "word": "lost",
+          "start_ms": 3600,
+          "end_ms": 4050,
+          "estimated": true
+        },
+        {
+          "word": "it",
+          "start_ms": 4050,
+          "end_ms": 4500,
+          "estimated": true
+        },
+        {
+          "word": "right",
+          "start_ms": 4500,
+          "end_ms": 4950,
+          "estimated": true
+        },
+        {
+          "word": "there.",
+          "start_ms": 4950,
+          "end_ms": 5400,
+          "estimated": true
+        }
+      ],
+      "grounded_in_timestamps": [
+        30.0
+      ],
+      "is_placeholder_voice": true
+    },
+    {
+      "id": "vo_7e979e2a644e",
+      "story_beat_id": "beat_b318591705e6",
+      "text": "And... caught. That attempt is over.",
+      "provider": "local_fallback",
+      "voice_id": null,
+      "audio_path": "../samples/output/_work_long_16x9/vo/vo_7e979e2a644e.wav",
+      "output_start_sec": 36.3,
+      "duration_sec": 6.0,
+      "alignment": [
+        {
+          "word": "And...",
+          "start_ms": 0,
+          "end_ms": 1000,
+          "estimated": true
+        },
+        {
+          "word": "caught.",
+          "start_ms": 1000,
+          "end_ms": 2000,
+          "estimated": true
+        },
+        {
+          "word": "That",
+          "start_ms": 2000,
+          "end_ms": 3000,
+          "estimated": true
+        },
+        {
+          "word": "attempt",
+          "start_ms": 3000,
+          "end_ms": 4000,
+          "estimated": true
+        },
+        {
+          "word": "is",
+          "start_ms": 4000,
+          "end_ms": 5000,
+          "estimated": true
+        },
+        {
+          "word": "over.",
+          "start_ms": 5000,
+          "end_ms": 6000,
+          "estimated": true
+        }
+      ],
+      "grounded_in_timestamps": [
+        36.0
+      ],
+      "is_placeholder_voice": true
+    },
+    {
+      "id": "vo_8ccf07981423",
+      "story_beat_id": "beat_546ad5a94d78",
+      "text": "Time to change the plan before I try again.",
+      "provider": "local_fallback",
+      "voice_id": null,
+      "audio_path": "../samples/output/_work_long_16x9/vo/vo_8ccf07981423.wav",
+      "output_start_sec": 44.3,
+      "duration_sec": 6.0,
+      "alignment": [
+        {
+          "word": "Time",
+          "start_ms": 0,
+          "end_ms": 666,
+          "estimated": true
+        },
+        {
+          "word": "to",
+          "start_ms": 666,
+          "end_ms": 1332,
+          "estimated": true
+        },
+        {
+          "word": "change",
+          "start_ms": 1332,
+          "end_ms": 1998,
+          "estimated": true
+        },
+        {
+          "word": "the",
+          "start_ms": 1998,
+          "end_ms": 2664,
+          "estimated": true
+        },
+        {
+          "word": "plan",
+          "start_ms": 2664,
+          "end_ms": 3330,
+          "estimated": true
+        },
+        {
+          "word": "before",
+          "start_ms": 3330,
+          "end_ms": 3996,
+          "estimated": true
+        },
+        {
+          "word": "I",
+          "start_ms": 3996,
+          "end_ms": 4662,
+          "estimated": true
+        },
+        {
+          "word": "try",
+          "start_ms": 4662,
+          "end_ms": 5328,
+          "estimated": true
+        },
+        {
+          "word": "again.",
+          "start_ms": 5328,
+          "end_ms": 5994,
+          "estimated": true
+        }
+      ],
+      "grounded_in_timestamps": [
+        44.0
+      ],
+      "is_placeholder_voice": true
+    },
+    {
+      "id": "vo_a7a1d7e5f6f7",
+      "story_beat_id": "beat_25ffae38a0a9",
+      "text": "Final egg. If this works, that's six for six.",
+      "provider": "local_fallback",
+      "voice_id": null,
+      "audio_path": "../samples/output/_work_long_16x9/vo/vo_a7a1d7e5f6f7.wav",
+      "output_start_sec": 54.3,
+      "duration_sec": 6.0,
+      "alignment": [
+        {
+          "word": "Final",
+          "start_ms": 0,
+          "end_ms": 666,
+          "estimated": true
+        },
+        {
+          "word": "egg.",
+          "start_ms": 666,
+          "end_ms": 1332,
+          "estimated": true
+        },
+        {
+          "word": "If",
+          "start_ms": 1332,
+          "end_ms": 1998,
+          "estimated": true
+        },
+        {
+          "word": "this",
+          "start_ms": 1998,
+          "end_ms": 2664,
+          "estimated": true
+        },
+        {
+          "word": "works,",
+          "start_ms": 2664,
+          "end_ms": 3330,
+          "estimated": true
+        },
+        {
+          "word": "that's",
+          "start_ms": 3330,
+          "end_ms": 3996,
+          "estimated": true
+        },
+        {
+          "word": "six",
+          "start_ms": 3996,
+          "end_ms": 4662,
+          "estimated": true
+        },
+        {
+          "word": "for",
+          "start_ms": 4662,
+          "end_ms": 5328,
+          "estimated": true
+        },
+        {
+          "word": "six.",
+          "start_ms": 5328,
+          "end_ms": 5994,
+          "estimated": true
+        }
+      ],
+      "grounded_in_timestamps": [
+        54.0
+      ],
+      "is_placeholder_voice": true
+    },
+    {
+      "id": "vo_7f6bf98c563b",
+      "story_beat_id": "beat_0b7d77f4770b",
+      "text": "All six eggs, stolen. That's the run.",
+      "provider": "local_fallback",
+      "voice_id": null,
+      "audio_path": "../samples/output/_work_long_16x9/vo/vo_7f6bf98c563b.wav",
+      "output_start_sec": 65.3,
+      "duration_sec": 6.0,
+      "alignment": [
+        {
+          "word": "All",
+          "start_ms": 0,
+          "end_ms": 857,
+          "estimated": true
+        },
+        {
+          "word": "six",
+          "start_ms": 857,
+          "end_ms": 1714,
+          "estimated": true
+        },
+        {
+          "word": "eggs,",
+          "start_ms": 1714,
+          "end_ms": 2571,
+          "estimated": true
+        },
+        {
+          "word": "stolen.",
+          "start_ms": 2571,
+          "end_ms": 3428,
+          "estimated": true
+        },
+        {
+          "word": "That's",
+          "start_ms": 3428,
+          "end_ms": 4285,
+          "estimated": true
+        },
+        {
+          "word": "the",
+          "start_ms": 4285,
+          "end_ms": 5142,
+          "estimated": true
+        },
+        {
+          "word": "run.",
+          "start_ms": 5142,
+          "end_ms": 5999,
+          "estimated": true
+        }
+      ],
+      "grounded_in_timestamps": [
+        65.0
+      ],
+      "is_placeholder_voice": true
+    }
+  ],
+  "graphics": [
+    {
+      "id": "gfx_5e9ac4ccdc8a",
+      "kind": "counter",
+      "output_start_sec": 8.0,
+      "output_end_sec": 18.0,
+      "params": {
+        "label": "EGGS STOLEN",
+        "value": "0/6"
+      }
+    },
+    {
+      "id": "gfx_b84d05fd50d0",
+      "kind": "cutout_overlay",
+      "output_start_sec": 18.0,
+      "output_end_sec": 30.0,
+      "params": {
+        "note": "synthetic moving test subject"
+      }
+    },
+    {
+      "id": "gfx_919ad08af84c",
+      "kind": "counter",
+      "output_start_sec": 54.0,
+      "output_end_sec": 65.0,
+      "params": {
+        "label": "EGGS STOLEN",
+        "value": "6/6"
+      }
+    },
+    {
+      "id": "gfx_5ffb2532fd21",
+      "kind": "end_screen",
+      "output_start_sec": 65.0,
+      "output_end_sec": 75.0,
+      "params": {
+        "text": "ALL 6 EGGS STOLEN"
+      }
+    }
+  ],
+  "motion": [
+    {
+      "id": "motion_b36f73c6d392",
+      "kind": "shake",
+      "output_start_sec": 18.0,
+      "output_end_sec": 30.0,
+      "params": {}
+    },
+    {
+      "id": "motion_f5ade1021852",
+      "kind": "zoom",
+      "output_start_sec": 30.0,
+      "output_end_sec": 36.0,
+      "params": {}
+    },
+    {
+      "id": "motion_b5f60a93bc90",
+      "kind": "zoom",
+      "output_start_sec": 54.0,
+      "output_end_sec": 65.0,
+      "params": {}
+    }
+  ],
+  "audio_tracks": [
+    {
+      "id": "track_beb71e69238a",
+      "kind": "voice",
+      "gain_db": 0.0,
+      "muted": false,
+      "solo": false
+    },
+    {
+      "id": "track_7ae80f2679d5",
+      "kind": "sfx",
+      "gain_db": 0.0,
+      "muted": false,
+      "solo": false
+    },
+    {
+      "id": "track_d25b065cbe8b",
+      "kind": "game_audio",
+      "gain_db": -6.0,
+      "muted": false,
+      "solo": false
+    },
+    {
+      "id": "track_42072f61ac5c",
+      "kind": "music",
+      "gain_db": -14.0,
+      "muted": false,
+      "solo": false
+    }
+  ],
+  "sound_cue_plan": {
+    "id": "cueplan_dbbcbaa25d30",
+    "project_id": "demo_long_16x9",
+    "density": "balanced",
+    "max_effects_per_minute": 20,
+    "category_cooldown_ms": {},
+    "cues": [
+      {
+        "id": "cue_c38e5b1cd21d",
+        "audio_asset_id": "asset_click_soft",
+        "category": "TEXT_POP",
+        "output_start_ms": 8000,
+        "duration_ms": 600,
+        "intensity": 0.7,
+        "gain_db": -4.0,
+        "pan": 0.0,
+        "pitch_semitones": 0.0,
+        "speed": 1.0,
+        "fade_in_ms": 5,
+        "fade_out_ms": 40,
+        "trigger_source": "simulated_annotation",
+        "source_timestamp_sec": 8.0,
+        "evidence": "segment 'GOAL: STEAL 6 EGGS - 0/6' at 8.0s",
+        "confidence": 0.95,
+        "sync_point": "text_pop_soft",
+        "approved": true,
+        "muted": false
+      },
+      {
+        "id": "cue_002766f22792",
+        "audio_asset_id": "asset_ticking",
+        "category": "CHASE",
+        "output_start_ms": 18000,
+        "duration_ms": 600,
+        "intensity": 0.7,
+        "gain_db": -6.0,
+        "pan": 0.0,
+        "pitch_semitones": 0.0,
+        "speed": 1.0,
+        "fade_in_ms": 5,
+        "fade_out_ms": 40,
+        "trigger_source": "simulated_annotation",
+        "source_timestamp_sec": 18.0,
+        "evidence": "segment 'CHASE: GUARD INCOMING' at 18.0s",
+        "confidence": 0.95,
+        "sync_point": "chase_tick_loop",
+        "approved": true,
+        "muted": false
+      },
+      {
+        "id": "cue_05f23bd51f85",
+        "audio_asset_id": "asset_digital_glitch",
+        "category": "NEAR_MISS",
+        "output_start_ms": 30000,
+        "duration_ms": 600,
+        "intensity": 0.7,
+        "gain_db": -2.0,
+        "pan": 0.0,
+        "pitch_semitones": 0.0,
+        "speed": 1.0,
+        "fade_in_ms": 5,
+        "fade_out_ms": 40,
+        "trigger_source": "simulated_annotation",
+        "source_timestamp_sec": 30.0,
+        "evidence": "segment 'NEAR MISS' at 30.0s",
+        "confidence": 0.95,
+        "sync_point": "near_miss_glitch",
+        "approved": true,
+        "muted": false
+      },
+      {
+        "id": "cue_fe88ee6c8e19",
+        "audio_asset_id": "asset_sub_bass_hit",
+        "category": "NEAR_MISS",
+        "output_start_ms": 30040,
+        "duration_ms": 600,
+        "intensity": 0.7,
+        "gain_db": -4.0,
+        "pan": 0.0,
+        "pitch_semitones": 0.0,
+        "speed": 1.0,
+        "fade_in_ms": 5,
+        "fade_out_ms": 40,
+        "trigger_source": "simulated_annotation",
+        "source_timestamp_sec": 30.0,
+        "evidence": "segment 'NEAR MISS' at 30.0s",
+        "confidence": 0.95,
+        "sync_point": "near_miss_glitch",
+        "approved": true,
+        "muted": false
+      },
+      {
+        "id": "cue_8e42825ab424",
+        "audio_asset_id": "asset_error_beep",
+        "category": "STEAL_FAILED",
+        "output_start_ms": 36000,
+        "duration_ms": 600,
+        "intensity": 0.7,
+        "gain_db": -2.0,
+        "pan": 0.0,
+        "pitch_semitones": 0.0,
+        "speed": 1.0,
+        "fade_in_ms": 5,
+        "fade_out_ms": 40,
+        "trigger_source": "simulated_annotation",
+        "source_timestamp_sec": 36.0,
+        "evidence": "segment 'CAUGHT - FAILED ATTEMPT' at 36.0s",
+        "confidence": 0.95,
+        "sync_point": "steal_failed_scratch",
+        "approved": true,
+        "muted": false
+      },
+      {
+        "id": "cue_76f8d35b1a92",
+        "audio_asset_id": "asset_whoosh_fall",
+        "category": "TRANSITION",
+        "output_start_ms": 44000,
+        "duration_ms": 600,
+        "intensity": 0.7,
+        "gain_db": -3.0,
+        "pan": 0.0,
+        "pitch_semitones": 0.0,
+        "speed": 1.0,
+        "fade_in_ms": 5,
+        "fade_out_ms": 40,
+        "trigger_source": "simulated_annotation",
+        "source_timestamp_sec": 44.0,
+        "evidence": "segment 'STRATEGY CHANGE' at 44.0s",
+        "confidence": 0.95,
+        "sync_point": "transition_whoosh",
+        "approved": true,
+        "muted": false
+      },
+      {
+        "id": "cue_e8d33fb48bb2",
+        "audio_asset_id": "asset_rising_tension",
+        "category": "BIG_REVEAL",
+        "output_start_ms": 53600,
+        "duration_ms": 600,
+        "intensity": 0.7,
+        "gain_db": -2.0,
+        "pan": 0.0,
+        "pitch_semitones": 0.0,
+        "speed": 1.0,
+        "fade_in_ms": 5,
+        "fade_out_ms": 40,
+        "trigger_source": "simulated_annotation",
+        "source_timestamp_sec": 54.0,
+        "evidence": "segment 'CLIMAX: FINAL EGG - 6/6' at 54.0s",
+        "confidence": 0.95,
+        "sync_point": "big_reveal_riser_chime",
+        "approved": true,
+        "muted": false
+      },
+      {
+        "id": "cue_5115f8088589",
+        "audio_asset_id": "asset_coin_chime",
+        "category": "BIG_REVEAL",
+        "output_start_ms": 54000,
+        "duration_ms": 600,
+        "intensity": 0.7,
+        "gain_db": 0.0,
+        "pan": 0.0,
+        "pitch_semitones": 0.0,
+        "speed": 1.0,
+        "fade_in_ms": 5,
+        "fade_out_ms": 40,
+        "trigger_source": "simulated_annotation",
+        "source_timestamp_sec": 54.0,
+        "evidence": "segment 'CLIMAX: FINAL EGG - 6/6' at 54.0s",
+        "confidence": 0.95,
+        "sync_point": "big_reveal_riser_chime",
+        "approved": true,
+        "muted": false
+      },
+      {
+        "id": "cue_defae1dd3600",
+        "audio_asset_id": "asset_reward_jingle",
+        "category": "FINAL_PAYOFF",
+        "output_start_ms": 64900,
+        "duration_ms": 600,
+        "intensity": 0.7,
+        "gain_db": 0.0,
+        "pan": 0.0,
+        "pitch_semitones": 0.0,
+        "speed": 1.0,
+        "fade_in_ms": 5,
+        "fade_out_ms": 40,
+        "trigger_source": "simulated_annotation",
+        "source_timestamp_sec": 65.0,
+        "evidence": "segment 'PAYOFF: ALL 6 STOLEN' at 65.0s",
+        "confidence": 0.95,
+        "sync_point": "final_payoff_jingle",
+        "approved": true,
+        "muted": false
+      }
+    ]
+  },
+  "created_at": "2026-10-11T21:39:09.001048",
+  "updated_at": "2026-10-11T21:39:09.001055"
+}

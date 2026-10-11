@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE fcpxml>
+
+<fcpxml version="1.8">
+    <resources>
+        <format id="r1" frameDuration="100/3000s" name="FFVideoFormat1080p30.0"/>
+        <asset name="annotated segment: EGG 1: ANTICIPATION" src="file:///home/user/claude-youtube/noobzy-studio/samples/input/fixture_short.mp4" format="r1" id="r2" duration="27/1s" start="0s" hasAudio="0" hasVideo="1"/>
+    </resources>
+    <asset-clip name="annotated segment: EGG 1: ANTICIPATION" format="r1" ref="r2" duration="27/1s"/>
+    <asset-clip name="annotated segment: EGG 1 REVEAL: COMMON" format="r1" ref="r2" duration="27/1s"/>
+    <asset-clip name="annotated segment: EGG 2: ANTICIPATION" format="r1" ref="r2" duration="27/1s"/>
+    <asset-clip name="annotated segment: EGG 2 REVEAL: RARE" format="r1" ref="r2" duration="27/1s"/>
+    <asset-clip name="annotated segment: EGG 3: ANTICIPATION" format="r1" ref="r2" duration="27/1s"/>
+    <asset-clip name="annotated segment: EGG 3 REVEAL: LEGENDARY!!" format="r1" ref="r2" duration="27/1s"/>
+    <asset-clip name="annotated segment: RESULT COMPARISON" format="r1" ref="r2" duration="27/1s"/>
+    <project name="noobzy-demo_short_9x16" uid="">
+        <sequence duration="27/1s" format="r1">
+            <spine>
+                <clip name="annotated segment: EGG 1: ANTICIPATION" offset="0s" duration="3/1s">
+                    <video offset="0s" ref="r2" duration="27/1s"/>
+                </clip>
+                <clip name="annotated segment: EGG 1 REVEAL: COMMON" offset="3s" duration="4/1s" start="3s">
+                    <video offset="0s" ref="r2" duration="27/1s"/>
+                </clip>
+                <clip name="annotated segment: EGG 2: ANTICIPATION" offset="7s" duration="3/1s" start="7s">
+                    <video offset="0s" ref="r2" duration="27/1s"/>
+                </clip>
+                <clip name="annotated segment: EGG 2 REVEAL: RARE" offset="10s" duration="4/1s" start="10s">
+                    <video offset="0s" ref="r2" duration="27/1s"/>
+                </clip>
+                <clip name="annotated segment: EGG 3: ANTICIPATION" offset="14s" duration="3/1s" start="14s">
+                    <video offset="0s" ref="r2" duration="27/1s"/>
+                </clip>
+                <clip name="annotated segment: EGG 3 REVEAL: LEGENDARY!!" offset="17s" duration="5/1s" start="17s">
+                    <video offset="0s" ref="r2" duration="27/1s"/>
+                </clip>
+                <clip name="annotated segment: RESULT COMPARISON" offset="22s" duration="5/1s" start="22s">
+                    <video offset="0s" ref="r2" duration="27/1s"/>
+                </clip>
+            </spine>
+        </sequence>
+    </project>
+</fcpxml>

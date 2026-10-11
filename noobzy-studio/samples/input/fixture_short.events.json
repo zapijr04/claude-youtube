@@ -1,0 +1,53 @@
+{
+  "total_duration_sec": 27.0,
+  "events": [
+    {
+      "at_sec": 0.0,
+      "label": "EGG 1: ANTICIPATION",
+      "kind": "egg_anticipation_1",
+      "simulated": true
+    },
+    {
+      "at_sec": 3.0,
+      "label": "EGG 1 REVEAL: COMMON",
+      "kind": "egg_reveal_1",
+      "simulated": true
+    },
+    {
+      "at_sec": 7.0,
+      "label": "EGG 2: ANTICIPATION",
+      "kind": "egg_anticipation_2",
+      "simulated": true
+    },
+    {
+      "at_sec": 10.0,
+      "label": "EGG 2 REVEAL: RARE",
+      "kind": "egg_reveal_2",
+      "simulated": true
+    },
+    {
+      "at_sec": 14.0,
+      "label": "EGG 3: ANTICIPATION",
+      "kind": "egg_anticipation_3",
+      "simulated": true
+    },
+    {
+      "at_sec": 17.0,
+      "label": "EGG 3 REVEAL: LEGENDARY!!",
+      "kind": "egg_reveal_3",
+      "simulated": true
+    },
+    {
+      "at_sec": 22.0,
+      "label": "RESULT COMPARISON",
+      "kind": "comparison",
+      "simulated": true
+    },
+    {
+      "at_sec": 27.0,
+      "label": "END",
+      "kind": "end",
+      "simulated": true
+    }
+  ]
+}

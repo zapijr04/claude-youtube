@@ -1,0 +1,859 @@
+{
+  "schema_version": "1.0.0",
+  "id": "tl_f40d6fc02eb8",
+  "project_id": "demo_short_9x16",
+  "preset": "SHORT_EGG_REVEAL",
+  "width": 1920,
+  "height": 1080,
+  "fps": 30.0,
+  "total_duration_sec": 27.0,
+  "scenes": [
+    {
+      "id": "scene_edf29046b453",
+      "media_id": "media_short_9x16",
+      "source_in_sec": 0.0,
+      "source_out_sec": 3.0,
+      "evidence_kind": "simulated_annotation",
+      "confidence": 0.95,
+      "keep": true,
+      "reason": "annotated segment: EGG 1: ANTICIPATION"
+    },
+    {
+      "id": "scene_54f355d8c76f",
+      "media_id": "media_short_9x16",
+      "source_in_sec": 3.0,
+      "source_out_sec": 7.0,
+      "evidence_kind": "simulated_annotation",
+      "confidence": 0.95,
+      "keep": true,
+      "reason": "annotated segment: EGG 1 REVEAL: COMMON"
+    },
+    {
+      "id": "scene_2fa4eeaaa674",
+      "media_id": "media_short_9x16",
+      "source_in_sec": 7.0,
+      "source_out_sec": 10.0,
+      "evidence_kind": "simulated_annotation",
+      "confidence": 0.95,
+      "keep": true,
+      "reason": "annotated segment: EGG 2: ANTICIPATION"
+    },
+    {
+      "id": "scene_894aee969e11",
+      "media_id": "media_short_9x16",
+      "source_in_sec": 10.0,
+      "source_out_sec": 14.0,
+      "evidence_kind": "simulated_annotation",
+      "confidence": 0.95,
+      "keep": true,
+      "reason": "annotated segment: EGG 2 REVEAL: RARE"
+    },
+    {
+      "id": "scene_296d78433632",
+      "media_id": "media_short_9x16",
+      "source_in_sec": 14.0,
+      "source_out_sec": 17.0,
+      "evidence_kind": "simulated_annotation",
+      "confidence": 0.95,
+      "keep": true,
+      "reason": "annotated segment: EGG 3: ANTICIPATION"
+    },
+    {
+      "id": "scene_7f501dffb7f3",
+      "media_id": "media_short_9x16",
+      "source_in_sec": 17.0,
+      "source_out_sec": 22.0,
+      "evidence_kind": "simulated_annotation",
+      "confidence": 0.95,
+      "keep": true,
+      "reason": "annotated segment: EGG 3 REVEAL: LEGENDARY!!"
+    },
+    {
+      "id": "scene_c01a310d520f",
+      "media_id": "media_short_9x16",
+      "source_in_sec": 22.0,
+      "source_out_sec": 27.0,
+      "evidence_kind": "simulated_annotation",
+      "confidence": 0.95,
+      "keep": true,
+      "reason": "annotated segment: RESULT COMPARISON"
+    }
+  ],
+  "beats": [
+    {
+      "id": "beat_0864f879345d",
+      "kind": "hook",
+      "output_start_sec": 0.0,
+      "output_end_sec": 3.0,
+      "source_scene_ids": [
+        "scene_edf29046b453"
+      ],
+      "summary": "EGG 1: ANTICIPATION"
+    },
+    {
+      "id": "beat_a19e1d1f094c",
+      "kind": "mini_hook",
+      "output_start_sec": 3.0,
+      "output_end_sec": 7.0,
+      "source_scene_ids": [
+        "scene_54f355d8c76f"
+      ],
+      "summary": "EGG 1 REVEAL: COMMON"
+    },
+    {
+      "id": "beat_aa6b0788279d",
+      "kind": "complication",
+      "output_start_sec": 7.0,
+      "output_end_sec": 10.0,
+      "source_scene_ids": [
+        "scene_2fa4eeaaa674"
+      ],
+      "summary": "EGG 2: ANTICIPATION"
+    },
+    {
+      "id": "beat_c01f90da21a1",
+      "kind": "mini_hook",
+      "output_start_sec": 10.0,
+      "output_end_sec": 14.0,
+      "source_scene_ids": [
+        "scene_894aee969e11"
+      ],
+      "summary": "EGG 2 REVEAL: RARE"
+    },
+    {
+      "id": "beat_24c17abb7ac5",
+      "kind": "climax",
+      "output_start_sec": 14.0,
+      "output_end_sec": 17.0,
+      "source_scene_ids": [
+        "scene_296d78433632"
+      ],
+      "summary": "EGG 3: ANTICIPATION"
+    },
+    {
+      "id": "beat_4b2bb158814e",
+      "kind": "outcome",
+      "output_start_sec": 17.0,
+      "output_end_sec": 22.0,
+      "source_scene_ids": [
+        "scene_7f501dffb7f3"
+      ],
+      "summary": "EGG 3 REVEAL: LEGENDARY!!"
+    },
+    {
+      "id": "beat_7cf8cd4036f7",
+      "kind": "outcome",
+      "output_start_sec": 22.0,
+      "output_end_sec": 27.0,
+      "source_scene_ids": [
+        "scene_c01a310d520f"
+      ],
+      "summary": "RESULT COMPARISON"
+    }
+  ],
+  "narration": [
+    {
+      "id": "vo_7b3d7681e526",
+      "story_beat_id": "beat_0864f879345d",
+      "text": "First Special Egg of the video -- let's see what we get.",
+      "provider": "local_fallback",
+      "voice_id": null,
+      "audio_path": "../samples/output/_work_short_9x16/vo/vo_7b3d7681e526.wav",
+      "output_start_sec": 0.3,
+      "duration_sec": 2.4,
+      "alignment": [
+        {
+          "word": "First",
+          "start_ms": 0,
+          "end_ms": 200,
+          "estimated": true
+        },
+        {
+          "word": "Special",
+          "start_ms": 200,
+          "end_ms": 400,
+          "estimated": true
+        },
+        {
+          "word": "Egg",
+          "start_ms": 400,
+          "end_ms": 600,
+          "estimated": true
+        },
+        {
+          "word": "of",
+          "start_ms": 600,
+          "end_ms": 800,
+          "estimated": true
+        },
+        {
+          "word": "the",
+          "start_ms": 800,
+          "end_ms": 1000,
+          "estimated": true
+        },
+        {
+          "word": "video",
+          "start_ms": 1000,
+          "end_ms": 1200,
+          "estimated": true
+        },
+        {
+          "word": "--",
+          "start_ms": 1200,
+          "end_ms": 1400,
+          "estimated": true
+        },
+        {
+          "word": "let's",
+          "start_ms": 1400,
+          "end_ms": 1600,
+          "estimated": true
+        },
+        {
+          "word": "see",
+          "start_ms": 1600,
+          "end_ms": 1800,
+          "estimated": true
+        },
+        {
+          "word": "what",
+          "start_ms": 1800,
+          "end_ms": 2000,
+          "estimated": true
+        },
+        {
+          "word": "we",
+          "start_ms": 2000,
+          "end_ms": 2200,
+          "estimated": true
+        },
+        {
+          "word": "get.",
+          "start_ms": 2200,
+          "end_ms": 2400,
+          "estimated": true
+        }
+      ],
+      "grounded_in_timestamps": [
+        0.0
+      ],
+      "is_placeholder_voice": true
+    },
+    {
+      "id": "vo_355e6f0e2ef9",
+      "story_beat_id": "beat_a19e1d1f094c",
+      "text": "A common egg to start things off.",
+      "provider": "local_fallback",
+      "voice_id": null,
+      "audio_path": "../samples/output/_work_short_9x16/vo/vo_355e6f0e2ef9.wav",
+      "output_start_sec": 3.3,
+      "duration_sec": 3.4,
+      "alignment": [
+        {
+          "word": "A",
+          "start_ms": 0,
+          "end_ms": 485,
+          "estimated": true
+        },
+        {
+          "word": "common",
+          "start_ms": 485,
+          "end_ms": 970,
+          "estimated": true
+        },
+        {
+          "word": "egg",
+          "start_ms": 970,
+          "end_ms": 1455,
+          "estimated": true
+        },
+        {
+          "word": "to",
+          "start_ms": 1455,
+          "end_ms": 1940,
+          "estimated": true
+        },
+        {
+          "word": "start",
+          "start_ms": 1940,
+          "end_ms": 2425,
+          "estimated": true
+        },
+        {
+          "word": "things",
+          "start_ms": 2425,
+          "end_ms": 2910,
+          "estimated": true
+        },
+        {
+          "word": "off.",
+          "start_ms": 2910,
+          "end_ms": 3395,
+          "estimated": true
+        }
+      ],
+      "grounded_in_timestamps": [
+        3.0
+      ],
+      "is_placeholder_voice": true
+    },
+    {
+      "id": "vo_76d61dbc451e",
+      "story_beat_id": "beat_aa6b0788279d",
+      "text": "Second egg incoming.",
+      "provider": "local_fallback",
+      "voice_id": null,
+      "audio_path": "../samples/output/_work_short_9x16/vo/vo_76d61dbc451e.wav",
+      "output_start_sec": 7.3,
+      "duration_sec": 2.4,
+      "alignment": [
+        {
+          "word": "Second",
+          "start_ms": 0,
+          "end_ms": 800,
+          "estimated": true
+        },
+        {
+          "word": "egg",
+          "start_ms": 800,
+          "end_ms": 1600,
+          "estimated": true
+        },
+        {
+          "word": "incoming.",
+          "start_ms": 1600,
+          "end_ms": 2400,
+          "estimated": true
+        }
+      ],
+      "grounded_in_timestamps": [
+        7.0
+      ],
+      "is_placeholder_voice": true
+    },
+    {
+      "id": "vo_6665c36c4561",
+      "story_beat_id": "beat_c01f90da21a1",
+      "text": "That's a rare! Already better than the first.",
+      "provider": "local_fallback",
+      "voice_id": null,
+      "audio_path": "../samples/output/_work_short_9x16/vo/vo_6665c36c4561.wav",
+      "output_start_sec": 10.3,
+      "duration_sec": 3.4,
+      "alignment": [
+        {
+          "word": "That's",
+          "start_ms": 0,
+          "end_ms": 425,
+          "estimated": true
+        },
+        {
+          "word": "a",
+          "start_ms": 425,
+          "end_ms": 850,
+          "estimated": true
+        },
+        {
+          "word": "rare!",
+          "start_ms": 850,
+          "end_ms": 1275,
+          "estimated": true
+        },
+        {
+          "word": "Already",
+          "start_ms": 1275,
+          "end_ms": 1700,
+          "estimated": true
+        },
+        {
+          "word": "better",
+          "start_ms": 1700,
+          "end_ms": 2125,
+          "estimated": true
+        },
+        {
+          "word": "than",
+          "start_ms": 2125,
+          "end_ms": 2550,
+          "estimated": true
+        },
+        {
+          "word": "the",
+          "start_ms": 2550,
+          "end_ms": 2975,
+          "estimated": true
+        },
+        {
+          "word": "first.",
+          "start_ms": 2975,
+          "end_ms": 3400,
+          "estimated": true
+        }
+      ],
+      "grounded_in_timestamps": [
+        10.0
+      ],
+      "is_placeholder_voice": true
+    },
+    {
+      "id": "vo_da05d20d4a25",
+      "story_beat_id": "beat_24c17abb7ac5",
+      "text": "Last egg of the video. This is the one that matters.",
+      "provider": "local_fallback",
+      "voice_id": null,
+      "audio_path": "../samples/output/_work_short_9x16/vo/vo_da05d20d4a25.wav",
+      "output_start_sec": 14.3,
+      "duration_sec": 2.4,
+      "alignment": [
+        {
+          "word": "Last",
+          "start_ms": 0,
+          "end_ms": 218,
+          "estimated": true
+        },
+        {
+          "word": "egg",
+          "start_ms": 218,
+          "end_ms": 436,
+          "estimated": true
+        },
+        {
+          "word": "of",
+          "start_ms": 436,
+          "end_ms": 654,
+          "estimated": true
+        },
+        {
+          "word": "the",
+          "start_ms": 654,
+          "end_ms": 872,
+          "estimated": true
+        },
+        {
+          "word": "video.",
+          "start_ms": 872,
+          "end_ms": 1090,
+          "estimated": true
+        },
+        {
+          "word": "This",
+          "start_ms": 1090,
+          "end_ms": 1308,
+          "estimated": true
+        },
+        {
+          "word": "is",
+          "start_ms": 1308,
+          "end_ms": 1526,
+          "estimated": true
+        },
+        {
+          "word": "the",
+          "start_ms": 1526,
+          "end_ms": 1744,
+          "estimated": true
+        },
+        {
+          "word": "one",
+          "start_ms": 1744,
+          "end_ms": 1962,
+          "estimated": true
+        },
+        {
+          "word": "that",
+          "start_ms": 1962,
+          "end_ms": 2180,
+          "estimated": true
+        },
+        {
+          "word": "matters.",
+          "start_ms": 2180,
+          "end_ms": 2398,
+          "estimated": true
+        }
+      ],
+      "grounded_in_timestamps": [
+        14.0
+      ],
+      "is_placeholder_voice": true
+    },
+    {
+      "id": "vo_d9e775593be0",
+      "story_beat_id": "beat_4b2bb158814e",
+      "text": "LEGENDARY! That is an incredible pull.",
+      "provider": "local_fallback",
+      "voice_id": null,
+      "audio_path": "../samples/output/_work_short_9x16/vo/vo_d9e775593be0.wav",
+      "output_start_sec": 17.3,
+      "duration_sec": 4.4,
+      "alignment": [
+        {
+          "word": "LEGENDARY!",
+          "start_ms": 0,
+          "end_ms": 733,
+          "estimated": true
+        },
+        {
+          "word": "That",
+          "start_ms": 733,
+          "end_ms": 1466,
+          "estimated": true
+        },
+        {
+          "word": "is",
+          "start_ms": 1466,
+          "end_ms": 2199,
+          "estimated": true
+        },
+        {
+          "word": "an",
+          "start_ms": 2199,
+          "end_ms": 2932,
+          "estimated": true
+        },
+        {
+          "word": "incredible",
+          "start_ms": 2932,
+          "end_ms": 3665,
+          "estimated": true
+        },
+        {
+          "word": "pull.",
+          "start_ms": 3665,
+          "end_ms": 4398,
+          "estimated": true
+        }
+      ],
+      "grounded_in_timestamps": [
+        17.0
+      ],
+      "is_placeholder_voice": true
+    },
+    {
+      "id": "vo_f7303bda17f8",
+      "story_beat_id": "beat_7cf8cd4036f7",
+      "text": "Common, rare, legendary -- three for three on getting better.",
+      "provider": "local_fallback",
+      "voice_id": null,
+      "audio_path": "../samples/output/_work_short_9x16/vo/vo_f7303bda17f8.wav",
+      "output_start_sec": 22.3,
+      "duration_sec": 4.4,
+      "alignment": [
+        {
+          "word": "Common,",
+          "start_ms": 0,
+          "end_ms": 440,
+          "estimated": true
+        },
+        {
+          "word": "rare,",
+          "start_ms": 440,
+          "end_ms": 880,
+          "estimated": true
+        },
+        {
+          "word": "legendary",
+          "start_ms": 880,
+          "end_ms": 1320,
+          "estimated": true
+        },
+        {
+          "word": "--",
+          "start_ms": 1320,
+          "end_ms": 1760,
+          "estimated": true
+        },
+        {
+          "word": "three",
+          "start_ms": 1760,
+          "end_ms": 2200,
+          "estimated": true
+        },
+        {
+          "word": "for",
+          "start_ms": 2200,
+          "end_ms": 2640,
+          "estimated": true
+        },
+        {
+          "word": "three",
+          "start_ms": 2640,
+          "end_ms": 3080,
+          "estimated": true
+        },
+        {
+          "word": "on",
+          "start_ms": 3080,
+          "end_ms": 3520,
+          "estimated": true
+        },
+        {
+          "word": "getting",
+          "start_ms": 3520,
+          "end_ms": 3960,
+          "estimated": true
+        },
+        {
+          "word": "better.",
+          "start_ms": 3960,
+          "end_ms": 4400,
+          "estimated": true
+        }
+      ],
+      "grounded_in_timestamps": [
+        22.0
+      ],
+      "is_placeholder_voice": true
+    }
+  ],
+  "graphics": [
+    {
+      "id": "gfx_5b97a3d5f03e",
+      "kind": "hero_card",
+      "output_start_sec": 3.0,
+      "output_end_sec": 7.0,
+      "params": {
+        "text": "COMMON EGG"
+      }
+    },
+    {
+      "id": "gfx_51b5a118a4c5",
+      "kind": "hero_card",
+      "output_start_sec": 10.0,
+      "output_end_sec": 14.0,
+      "params": {
+        "text": "RARE EGG"
+      }
+    },
+    {
+      "id": "gfx_c0917d5a11dc",
+      "kind": "hero_card",
+      "output_start_sec": 17.0,
+      "output_end_sec": 22.0,
+      "params": {
+        "text": "LEGENDARY EGG!!"
+      }
+    },
+    {
+      "id": "gfx_20bf4c9f65c6",
+      "kind": "comparison_card",
+      "output_start_sec": 22.0,
+      "output_end_sec": 27.0,
+      "params": {
+        "text": "3 EGGS OPENED"
+      }
+    }
+  ],
+  "motion": [
+    {
+      "id": "motion_f9be6d5659e9",
+      "kind": "zoom",
+      "output_start_sec": 3.0,
+      "output_end_sec": 7.0,
+      "params": {}
+    },
+    {
+      "id": "motion_e91be9ac351d",
+      "kind": "zoom",
+      "output_start_sec": 10.0,
+      "output_end_sec": 14.0,
+      "params": {}
+    },
+    {
+      "id": "motion_a5e4bd3e0114",
+      "kind": "zoom",
+      "output_start_sec": 17.0,
+      "output_end_sec": 22.0,
+      "params": {}
+    }
+  ],
+  "audio_tracks": [
+    {
+      "id": "track_13647feb47e3",
+      "kind": "voice",
+      "gain_db": 0.0,
+      "muted": false,
+      "solo": false
+    },
+    {
+      "id": "track_819e261a231d",
+      "kind": "sfx",
+      "gain_db": 0.0,
+      "muted": false,
+      "solo": false
+    },
+    {
+      "id": "track_96514631f3a3",
+      "kind": "game_audio",
+      "gain_db": -6.0,
+      "muted": false,
+      "solo": false
+    },
+    {
+      "id": "track_3b8eacaa937f",
+      "kind": "music",
+      "gain_db": -14.0,
+      "muted": false,
+      "solo": false
+    }
+  ],
+  "sound_cue_plan": {
+    "id": "cueplan_3c6534b95f70",
+    "project_id": "demo_short_9x16",
+    "density": "high-energy",
+    "max_effects_per_minute": 20,
+    "category_cooldown_ms": {},
+    "cues": [
+      {
+        "id": "cue_5067f211126b",
+        "audio_asset_id": "asset_click_soft",
+        "category": "EGG_OPEN",
+        "output_start_ms": 2750,
+        "duration_ms": 600,
+        "intensity": 0.7,
+        "gain_db": -2.0,
+        "pan": 0.0,
+        "pitch_semitones": 0.0,
+        "speed": 1.0,
+        "fade_in_ms": 5,
+        "fade_out_ms": 40,
+        "trigger_source": "simulated_annotation",
+        "source_timestamp_sec": 3.0,
+        "evidence": "segment 'EGG 1 REVEAL: COMMON' at 3.0s",
+        "confidence": 0.95,
+        "sync_point": "egg_open_quick_pop",
+        "approved": true,
+        "muted": false
+      },
+      {
+        "id": "cue_ef0e4368d188",
+        "audio_asset_id": "asset_pop",
+        "category": "EGG_OPEN",
+        "output_start_ms": 3000,
+        "duration_ms": 600,
+        "intensity": 0.7,
+        "gain_db": 0.0,
+        "pan": 0.0,
+        "pitch_semitones": 0.0,
+        "speed": 1.0,
+        "fade_in_ms": 5,
+        "fade_out_ms": 40,
+        "trigger_source": "simulated_annotation",
+        "source_timestamp_sec": 3.0,
+        "evidence": "segment 'EGG 1 REVEAL: COMMON' at 3.0s",
+        "confidence": 0.95,
+        "sync_point": "egg_open_quick_pop",
+        "approved": true,
+        "muted": false
+      },
+      {
+        "id": "cue_fae6e58cf87c",
+        "audio_asset_id": "asset_click_soft",
+        "category": "EGG_OPEN",
+        "output_start_ms": 9750,
+        "duration_ms": 600,
+        "intensity": 0.7,
+        "gain_db": -2.0,
+        "pan": 0.0,
+        "pitch_semitones": 0.0,
+        "speed": 1.0,
+        "fade_in_ms": 5,
+        "fade_out_ms": 40,
+        "trigger_source": "simulated_annotation",
+        "source_timestamp_sec": 10.0,
+        "evidence": "segment 'EGG 2 REVEAL: RARE' at 10.0s",
+        "confidence": 0.95,
+        "sync_point": "egg_open_quick_pop",
+        "approved": true,
+        "muted": false
+      },
+      {
+        "id": "cue_1e238506cac1",
+        "audio_asset_id": "asset_pop",
+        "category": "EGG_OPEN",
+        "output_start_ms": 10000,
+        "duration_ms": 600,
+        "intensity": 0.7,
+        "gain_db": 0.0,
+        "pan": 0.0,
+        "pitch_semitones": 0.0,
+        "speed": 1.0,
+        "fade_in_ms": 5,
+        "fade_out_ms": 40,
+        "trigger_source": "simulated_annotation",
+        "source_timestamp_sec": 10.0,
+        "evidence": "segment 'EGG 2 REVEAL: RARE' at 10.0s",
+        "confidence": 0.95,
+        "sync_point": "egg_open_quick_pop",
+        "approved": true,
+        "muted": false
+      },
+      {
+        "id": "cue_7c7aeeed6f8c",
+        "audio_asset_id": "asset_rising_tension",
+        "category": "BIG_REVEAL",
+        "output_start_ms": 16600,
+        "duration_ms": 600,
+        "intensity": 0.7,
+        "gain_db": -2.0,
+        "pan": 0.0,
+        "pitch_semitones": 0.0,
+        "speed": 1.0,
+        "fade_in_ms": 5,
+        "fade_out_ms": 40,
+        "trigger_source": "simulated_annotation",
+        "source_timestamp_sec": 17.0,
+        "evidence": "segment 'EGG 3 REVEAL: LEGENDARY!!' at 17.0s",
+        "confidence": 0.95,
+        "sync_point": "big_reveal_riser_chime",
+        "approved": true,
+        "muted": false
+      },
+      {
+        "id": "cue_0eff61149d67",
+        "audio_asset_id": "asset_coin_chime",
+        "category": "BIG_REVEAL",
+        "output_start_ms": 17000,
+        "duration_ms": 600,
+        "intensity": 0.7,
+        "gain_db": 0.0,
+        "pan": 0.0,
+        "pitch_semitones": 0.0,
+        "speed": 1.0,
+        "fade_in_ms": 5,
+        "fade_out_ms": 40,
+        "trigger_source": "simulated_annotation",
+        "source_timestamp_sec": 17.0,
+        "evidence": "segment 'EGG 3 REVEAL: LEGENDARY!!' at 17.0s",
+        "confidence": 0.95,
+        "sync_point": "big_reveal_riser_chime",
+        "approved": true,
+        "muted": false
+      },
+      {
+        "id": "cue_bc43d2d3cb02",
+        "audio_asset_id": "asset_whoosh_fall",
+        "category": "TRANSITION",
+        "output_start_ms": 22000,
+        "duration_ms": 600,
+        "intensity": 0.7,
+        "gain_db": -3.0,
+        "pan": 0.0,
+        "pitch_semitones": 0.0,
+        "speed": 1.0,
+        "fade_in_ms": 5,
+        "fade_out_ms": 40,
+        "trigger_source": "simulated_annotation",
+        "source_timestamp_sec": 22.0,
+        "evidence": "segment 'RESULT COMPARISON' at 22.0s",
+        "confidence": 0.95,
+        "sync_point": "transition_whoosh",
+        "approved": true,
+        "muted": false
+      }
+    ]
+  },
+  "created_at": "2026-10-11T21:39:55.409492",
+  "updated_at": "2026-10-11T21:39:55.409497"
+}

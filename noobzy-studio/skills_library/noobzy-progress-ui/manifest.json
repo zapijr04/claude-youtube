@@ -1,0 +1,23 @@
+{
+  "id": "noobzy-progress-ui",
+  "version": "1.0.0",
+  "title": "Noobzy Progress UI",
+  "description": "Robbery counter (0/6), money, and timer overlays, numbers sourced from real annotations only.",
+  "triggers": [
+    "counter",
+    "progress",
+    "timer"
+  ],
+  "capabilities": [
+    "graphics.counter",
+    "graphics.timer"
+  ],
+  "dependencies": [],
+  "allowed_parameters": {},
+  "examples": [
+    "Show a 0/6 counter that updates as eggs are stolen."
+  ],
+  "provenance": "built_in",
+  "enabled": true,
+  "skill_md_path": "../skills_library/noobzy-progress-ui/SKILL.md"
+}

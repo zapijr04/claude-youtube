@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+pydantic>=2
+pytest
+httpx
+opentimelineio
+otio-fcpx-xml-adapter
+python-multipart
+numpy

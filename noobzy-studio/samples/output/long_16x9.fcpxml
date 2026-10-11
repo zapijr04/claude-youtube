@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE fcpxml>
+
+<fcpxml version="1.8">
+    <resources>
+        <format id="r1" frameDuration="100/3000s" name="FFVideoFormat1080p30.0"/>
+        <asset name="annotated segment: HOOK: I TRIED TO ROB EVERY PLAYER" src="file:///home/user/claude-youtube/noobzy-studio/samples/input/fixture_long.mp4" format="r1" id="r2" duration="75/1s" start="0s" hasAudio="0" hasVideo="1"/>
+    </resources>
+    <asset-clip name="annotated segment: HOOK: I TRIED TO ROB EVERY PLAYER" format="r1" ref="r2" duration="75/1s"/>
+    <asset-clip name="annotated segment: GOAL: STEAL 6 EGGS - 0/6" format="r1" ref="r2" duration="75/1s"/>
+    <asset-clip name="annotated segment: CHASE: GUARD INCOMING" format="r1" ref="r2" duration="75/1s"/>
+    <asset-clip name="annotated segment: NEAR MISS" format="r1" ref="r2" duration="75/1s"/>
+    <asset-clip name="annotated segment: CAUGHT - FAILED ATTEMPT" format="r1" ref="r2" duration="75/1s"/>
+    <asset-clip name="annotated segment: STRATEGY CHANGE" format="r1" ref="r2" duration="75/1s"/>
+    <asset-clip name="annotated segment: CLIMAX: FINAL EGG - 6/6" format="r1" ref="r2" duration="75/1s"/>
+    <asset-clip name="annotated segment: PAYOFF: ALL 6 STOLEN" format="r1" ref="r2" duration="75/1s"/>
+    <project name="noobzy-demo_long_16x9" uid="">
+        <sequence duration="75/1s" format="r1">
+            <spine>
+                <clip name="annotated segment: HOOK: I TRIED TO ROB EVERY PLAYER" offset="0s" duration="8/1s">
+                    <video offset="0s" ref="r2" duration="75/1s"/>
+                </clip>
+                <clip name="annotated segment: GOAL: STEAL 6 EGGS - 0/6" offset="8s" duration="10/1s" start="8s">
+                    <video offset="0s" ref="r2" duration="75/1s"/>
+                </clip>
+                <clip name="annotated segment: CHASE: GUARD INCOMING" offset="18s" duration="12/1s" start="18s">
+                    <video offset="0s" ref="r2" duration="75/1s"/>
+                </clip>
+                <clip name="annotated segment: NEAR MISS" offset="30s" duration="6/1s" start="30s">
+                    <video offset="0s" ref="r2" duration="75/1s"/>
+                </clip>
+                <clip name="annotated segment: CAUGHT - FAILED ATTEMPT" offset="36s" duration="8/1s" start="36s">
+                    <video offset="0s" ref="r2" duration="75/1s"/>
+                </clip>
+                <clip name="annotated segment: STRATEGY CHANGE" offset="44s" duration="10/1s" start="44s">
+                    <video offset="0s" ref="r2" duration="75/1s"/>
+                </clip>
+                <clip name="annotated segment: CLIMAX: FINAL EGG - 6/6" offset="54s" duration="11/1s" start="54s">
+                    <video offset="0s" ref="r2" duration="75/1s"/>
+                </clip>
+                <clip name="annotated segment: PAYOFF: ALL 6 STOLEN" offset="65s" duration="10/1s" start="65s">
+                    <video offset="0s" ref="r2" duration="75/1s"/>
+                </clip>
+            </spine>
+        </sequence>
+    </project>
+</fcpxml>

@@ -1,0 +1,28 @@
+{
+  "id": "noobzy-motion",
+  "version": "1.0.0",
+  "title": "Noobzy Motion Graphics",
+  "description": "Tracked highlights, gameplay cutouts, zooms, parallax, camera shake, reveals -- timed with sound.",
+  "triggers": [
+    "motion",
+    "zoom",
+    "shake",
+    "cutout"
+  ],
+  "capabilities": [
+    "motion.zoom",
+    "motion.shake",
+    "motion.cutout_overlay"
+  ],
+  "dependencies": [],
+  "allowed_parameters": {
+    "zoom_amount": 0.08,
+    "shake_amp_px": 6
+  },
+  "examples": [
+    "Add a zoom on the climax beat and shake during the chase beat."
+  ],
+  "provenance": "built_in",
+  "enabled": true,
+  "skill_md_path": "../skills_library/noobzy-motion/SKILL.md"
+}

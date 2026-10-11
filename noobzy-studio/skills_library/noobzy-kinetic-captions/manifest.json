@@ -1,0 +1,31 @@
+{
+  "id": "noobzy-kinetic-captions",
+  "version": "1.0.0",
+  "title": "Noobzy Kinetic Captions",
+  "description": "Synchronized cyan/white/yellow emphasis captions on selected key words, pop/scale, mobile-legible.",
+  "triggers": [
+    "captions",
+    "subtitles",
+    "kinetic text"
+  ],
+  "capabilities": [
+    "graphics.kinetic_caption"
+  ],
+  "dependencies": [
+    "noobzy-selective-captions"
+  ],
+  "allowed_parameters": {
+    "colors": [
+      "0x1FD1FF",
+      "0xFFFFFF",
+      "0xFFD700"
+    ],
+    "max_words": 14
+  },
+  "examples": [
+    "Generate kinetic captions for the current narration track."
+  ],
+  "provenance": "built_in",
+  "enabled": true,
+  "skill_md_path": "../skills_library/noobzy-kinetic-captions/SKILL.md"
+}

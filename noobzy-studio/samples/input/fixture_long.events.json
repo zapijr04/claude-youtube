@@ -1,0 +1,59 @@
+{
+  "total_duration_sec": 75.0,
+  "events": [
+    {
+      "at_sec": 0.0,
+      "label": "HOOK: I TRIED TO ROB EVERY PLAYER",
+      "kind": "hook",
+      "simulated": true
+    },
+    {
+      "at_sec": 8.0,
+      "label": "GOAL: STEAL 6 EGGS - 0/6",
+      "kind": "goal",
+      "simulated": true
+    },
+    {
+      "at_sec": 18.0,
+      "label": "CHASE: GUARD INCOMING",
+      "kind": "chase",
+      "simulated": true
+    },
+    {
+      "at_sec": 30.0,
+      "label": "NEAR MISS",
+      "kind": "near_miss",
+      "simulated": true
+    },
+    {
+      "at_sec": 36.0,
+      "label": "CAUGHT - FAILED ATTEMPT",
+      "kind": "fail",
+      "simulated": true
+    },
+    {
+      "at_sec": 44.0,
+      "label": "STRATEGY CHANGE",
+      "kind": "strategy",
+      "simulated": true
+    },
+    {
+      "at_sec": 54.0,
+      "label": "CLIMAX: FINAL EGG - 6/6",
+      "kind": "climax",
+      "simulated": true
+    },
+    {
+      "at_sec": 65.0,
+      "label": "PAYOFF: ALL 6 STOLEN",
+      "kind": "payoff",
+      "simulated": true
+    },
+    {
+      "at_sec": 75.0,
+      "label": "END",
+      "kind": "end",
+      "simulated": true
+    }
+  ]
+}
