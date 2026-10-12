@@ -1,5 +1,27 @@
 # Decisions log
 
+## Follow-up: generic auto-director instead of an AI script writer
+
+The user asked (in Czech) whether uploading a video and picking Short/Long
+already produces a finished result automatically. Honest answer: for real
+footage it didn't -- `/analyze` detected real cuts but left narration as an
+explicit placeholder and added no SFX/motion, since no vision model exists
+in this environment to understand gameplay and write about it. Rather than
+assume which direction to take, offered the user a real choice: a free,
+local, no-API-key generic editorial auto-director (transition SFX + motion
+keyed off real cut timing, user supplies narration text themselves) versus
+a paid, credential-requiring vision-model script writer. They chose the
+generic option.
+
+Two new builder functions implement it honestly: `apply_generic_auto_director`
+reacts only to real, measured scene-cut durations (never claims to know
+what's happening on screen), and `distribute_script_across_scenes` times
+the user's own words against real scenes proportionally by duration rather
+than inventing any content. Verified live end-to-end with headless
+Chromium against the real backend -- not just unit tests -- since the
+whole point was proving the *actual one-click flow* works, not just that
+the underlying function returns the right data structure.
+
 ## 2026 upgrade pass (addendum points 1-6)
 
 - **Referenced spec file not found, proceeded on the pasted addendum

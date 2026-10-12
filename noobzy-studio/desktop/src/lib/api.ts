@@ -70,8 +70,22 @@ export const api = {
     return res.json();
   },
 
-  analyze: (projectId: string, mediaId: string) =>
-    request(`/projects/${projectId}/analyze?media_id=${mediaId}`, { method: "POST" }),
+  analyze: (
+    projectId: string,
+    mediaId: string,
+    opts?: { narrationScript?: string; autoStyle?: boolean; applyTargetDuration?: boolean }
+  ) =>
+    request(
+      `/projects/${projectId}/analyze?media_id=${mediaId}` +
+        (opts?.applyTargetDuration ? "&apply_target_duration=true" : ""),
+      {
+        method: "POST",
+        body: JSON.stringify({
+          narration_script: opts?.narrationScript || null,
+          auto_style: opts?.autoStyle ?? true,
+        }),
+      }
+    ),
 
   getTimeline: (projectId: string) => request(`/projects/${projectId}/timeline`),
   putTimeline: (projectId: string, timeline: unknown) =>

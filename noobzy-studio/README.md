@@ -6,6 +6,15 @@ channel: import real gameplay, get a grounded rough cut, add narration
 automatic placement, mixed and ducked audio, kinetic captions and motion
 graphics, and export a real MP4 plus a DaVinci-compatible cutlist.
 
+The one-click path: upload a video, pick Long/Short, optionally paste a
+rough account of what happened (you recorded it, you know), click
+"Detect Scenes & Build Rough Cut" -- real cuts get found, your script (if
+any) is timed across them, and generic editorial motion + transition SFX
+get applied automatically. No AI invents what's on screen; nothing claims
+to understand your gameplay without you telling it. See "Follow-up" in
+`docs/IMPLEMENTATION_STATUS.md` for exactly what that does and doesn't
+cover.
+
 This lives inside the `claude-youtube` repo (a separate Claude Code skill
 package -- see the repo root `README.md`/`CLAUDE.md`) as its own
 self-contained subproject. It does not modify or depend on `skills/claude-youtube/`.

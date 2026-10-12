@@ -100,6 +100,33 @@ def test_narration_regen_speed_ramp_and_gap_report_over_http(client, long_fixtur
     assert len(r.json()) >= 3  # analyze + speed-ramp + (maybe) narration regen
 
 
+def test_analyze_with_narration_script_and_auto_style_over_http(client, long_fixture):
+    r = client.post("/projects", json={"name": "Auto Upload", "preset": "LONG_FORM_STORY", "target_duration_sec": 75})
+    pid = r.json()["id"]
+    with open(long_fixture["path"], "rb") as f:
+        r = client.post(f"/projects/{pid}/media", files={"file": ("fixture_long.mp4", f, "video/mp4")})
+    mid = r.json()["id"]
+
+    script = (
+        "I tried to rob every player on this server. First I scoped out a target. "
+        "He spotted me almost immediately and the chase was on. That was way too close. "
+        "I had to back off and rethink my approach. This is the moment it all came together. "
+        "In the end I walked away with everything."
+    )
+    r = client.post(
+        f"/projects/{pid}/analyze",
+        params={"media_id": mid},
+        json={"narration_script": script, "auto_style": True},
+    )
+    assert r.status_code == 200
+
+    timeline = client.get(f"/projects/{pid}/timeline").json()
+    real_text = [nb["text"] for nb in timeline["narration"] if not nb["text"].startswith("[Add narration")]
+    assert real_text, "at least one scene should carry real user-supplied text"
+    assert timeline["motion"], "auto_style should add generic motion"
+    assert timeline["sound_cue_plan"]["cues"], "auto_style should add transition SFX at real cut boundaries"
+
+
 def test_skills_endpoints_over_http(client):
     r = client.get("/skills")
     assert r.status_code == 200

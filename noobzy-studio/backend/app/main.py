@@ -116,9 +116,26 @@ async def import_media(project_id: str, file: UploadFile) -> dict:
     return json.loads(media.model_dump_json())
 
 
+class AnalyzeOptions(BaseModel):
+    # Optional body: the user's own account of what happened in the
+    # footage, split across the real detected scenes proportionally by
+    # scene duration (app.timeline.builder.distribute_script_across_scenes)
+    # -- the human supplies every word, this only times them.
+    narration_script: str | None = None
+    # Generic, non-fabricated editorial rhythm (transition SFX at real cut
+    # boundaries, zoom/shake keyed off each scene's own duration) so a
+    # plain upload-and-pick-a-preset flow still produces a styled result
+    # without any AI claiming to understand the footage. On by default.
+    auto_style: bool = True
+
+
 @app.post("/projects/{project_id}/analyze")
 def analyze_media(
-    project_id: str, media_id: str, scene_threshold: float = 0.3, apply_target_duration: bool = False
+    project_id: str,
+    media_id: str,
+    scene_threshold: float = 0.3,
+    apply_target_duration: bool = False,
+    options: AnalyzeOptions | None = None,
 ) -> dict:
     media_rows = [json.loads(r) for r in db.list_source_media(project_id)]
     media = next((m for m in media_rows if m["id"] == media_id), None)
@@ -139,6 +156,7 @@ def analyze_media(
         selected_windows = select_windows_for_target_duration(windows, project.target_duration_sec)
     output_duration = sum(e - s for s, e in selected_windows)
 
+    opts = options or AnalyzeOptions()
     timeline = build_rough_cut_from_scene_cuts(
         project_id=project_id,
         media_id=media_id,
@@ -148,6 +166,8 @@ def analyze_media(
         fps=media["fps"],
         total_duration_sec=output_duration,
         windows=selected_windows,
+        narration_script=opts.narration_script,
+        auto_style=opts.auto_style,
     )
     db.upsert_timeline(timeline)
     project.status = ProjectStatus.ready

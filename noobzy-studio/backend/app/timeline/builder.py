@@ -13,6 +13,8 @@ it is.
 """
 from __future__ import annotations
 
+import re
+
 from app.schemas import (
     AspectPreset,
     AudioTrack,
@@ -122,6 +124,92 @@ def select_windows_for_target_duration(
     return sorted(kept, key=lambda w: w[0])
 
 
+def distribute_script_across_scenes(script_text: str, scenes: list[Scene]) -> dict[str, str]:
+    """Splits a user-supplied narration script across the real detected
+    scenes, proportionally by each scene's own duration (a longer scene
+    gets more of the script than a short one) -- grounded in real timing,
+    not an AI claim about what happens in each scene. The user wrote the
+    words; this only decides *when* each sentence is spoken. Returns
+    {scene_id: assigned_text}, omitting scenes with no sentences assigned
+    (more scenes than sentences) -- callers should leave those as
+    honest placeholders rather than inventing filler.
+    """
+    sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", script_text.strip()) if s.strip()]
+    if not sentences or not scenes:
+        return {}
+
+    durations = [max(0.01, s.source_out_sec - s.source_in_sec) for s in scenes]
+    total_duration = sum(durations)
+    boundaries = []
+    cum = 0.0
+    for d in durations:
+        cum += d
+        boundaries.append(cum / total_duration)
+
+    assigned: dict[str, list[str]] = {}
+    n = len(sentences)
+    for k, sentence in enumerate(sentences):
+        frac = (k + 0.5) / n
+        scene_idx = next((i for i, b in enumerate(boundaries) if frac <= b), len(scenes) - 1)
+        assigned.setdefault(scenes[scene_idx].id, []).append(sentence)
+
+    return {scene_id: " ".join(parts) for scene_id, parts in assigned.items()}
+
+
+# Scene durations more than this factor above the mean get a slow, drawing
+# zoom; more than this factor below get a snappier shake. A generic,
+# explicitly-heuristic editorial rhythm -- NOT a claim about what's
+# happening on screen, which this environment has no way to know for real
+# (uploaded) footage.
+_AUTO_ZOOM_FACTOR = 1.4
+_AUTO_SHAKE_FACTOR = 0.6
+
+
+def apply_generic_auto_director(timeline: TimelineDocument) -> TimelineDocument:
+    """Adds generic, non-fabricated editorial rhythm to a timeline built
+    from real detected cuts alone (no manual/simulated markers): a
+    transition SFX at every real scene boundary, and alternating
+    zoom/shake motion keyed off each scene's own real duration relative to
+    the average. This never claims to know what happened in the footage --
+    it only reacts to cut timing, which is a real, measured signal."""
+    if not timeline.scenes:
+        return timeline
+
+    durations = [s.source_out_sec - s.source_in_sec for s in timeline.scenes]
+    avg = sum(durations) / len(durations)
+
+    cues: list[SoundCue] = list(timeline.sound_cue_plan.cues) if timeline.sound_cue_plan else []
+    motions: list[MotionPreset] = list(timeline.motion)
+
+    for scene, dur in zip(timeline.scenes, durations):
+        if dur > avg * _AUTO_ZOOM_FACTOR:
+            end = min(scene.source_out_sec, scene.source_in_sec + min(dur, 4.0))
+            motions.append(MotionPreset(kind=MotionPresetKind.zoom, output_start_sec=scene.source_in_sec, output_end_sec=end))
+        elif dur < avg * _AUTO_SHAKE_FACTOR:
+            motions.append(MotionPreset(kind=MotionPresetKind.shake, output_start_sec=scene.source_in_sec, output_end_sec=scene.source_out_sec))
+
+        if scene is not timeline.scenes[0]:
+            cues.append(
+                SoundCue(
+                    audio_asset_id="",
+                    category=SoundCueCategory.TRANSITION,
+                    output_start_ms=int(scene.source_in_sec * 1000),
+                    duration_ms=400,
+                    trigger_source=EvidenceKind.scene_cut_detected,
+                    source_timestamp_sec=scene.source_in_sec,
+                    evidence=f"real scene-cut boundary at {scene.source_in_sec:.1f}s",
+                    confidence=scene.confidence,
+                )
+            )
+
+    timeline.motion = motions
+    if timeline.sound_cue_plan:
+        timeline.sound_cue_plan.cues = cues
+    else:
+        timeline.sound_cue_plan = SoundCuePlan(project_id=timeline.project_id, cues=cues)
+    return timeline
+
+
 def build_rough_cut_from_scene_cuts(
     project_id: str,
     media_id: str,
@@ -131,13 +219,26 @@ def build_rough_cut_from_scene_cuts(
     fps: float,
     total_duration_sec: float,
     windows: list[tuple[float, float]],
+    narration_script: str | None = None,
+    auto_style: bool = True,
 ) -> TimelineDocument:
     """Honest fallback for real (non-annotated) footage: no vision model is
     configured in this environment, so this does NOT invent a story. It
-    turns detected scene-cut windows into a neutral rough cut with generic
-    per-window narration placeholders the user is expected to rewrite, and
-    adds no graphics/SFX/motion -- those require either manual markers or a
-    creative-brief instruction, never fabricated automatically."""
+    turns detected scene-cut windows into a neutral rough cut. Two
+    explicitly-labeled, non-fabricating automations are layered on top so
+    a plain upload-and-pick-a-preset flow still produces something real:
+
+    - `narration_script`: if the user pastes/types their own account of
+      what happened (they recorded it; they know), it is split across the
+      real scenes proportionally by scene duration
+      (distribute_script_across_scenes) -- the human supplies every word,
+      this only times them. Without it, scenes keep an explicit
+      placeholder the user is expected to fill in.
+    - `auto_style` (default True): generic editorial rhythm --
+      transition SFX at real cut boundaries and zoom/shake keyed off each
+      scene's own real duration (apply_generic_auto_director). This is an
+      editing-style template, not a claim about on-screen events.
+    """
     scenes: list[Scene] = []
     beats: list[StoryBeat] = []
     narration: list[NarrationBlock] = []
@@ -169,7 +270,14 @@ def build_rough_cut_from_scene_cuts(
             )
         )
 
-    return TimelineDocument(
+    if narration_script and narration_script.strip():
+        assigned_text = distribute_script_across_scenes(narration_script, scenes)
+        for scene, nb in zip(scenes, narration):
+            if scene.id in assigned_text:
+                nb.text = assigned_text[scene.id]
+                nb.duration_sec = 0.0  # re-estimated from the real text at render time
+
+    timeline = TimelineDocument(
         project_id=project_id,
         preset=preset,
         width=width,
@@ -187,6 +295,11 @@ def build_rough_cut_from_scene_cuts(
         ],
         sound_cue_plan=SoundCuePlan(project_id=project_id),
     )
+
+    if auto_style:
+        apply_generic_auto_director(timeline)
+
+    return timeline
 
 
 def build_timeline_from_events(
